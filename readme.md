@@ -19,6 +19,7 @@ In its current state, this project has 3 entities:
 The current version of `Sensor Reading` contains both the id of its sensor and the id of its location. Normally, the 
 reading would not have both, but I decided to include it so I could make a few more validations on each reading.
 
+Also, all entities have read-only properties and validation on setters, to make sure everything is has it should be.
 
 # How to make it all work
 You use the current scripts:
@@ -31,3 +32,15 @@ You use the current scripts:
 - Clients, services, private apis and other clients can access teh gRPC endpoints.
 - Meanwhile, a public API can be used (by a frontend or other third party applications), to make use of gRPC`s endpoint.  
 ![Simplified big picture of this project](schema_envisdp_v1simple.png)
+
+
+# TODO
+1. Create flask interface
+2. Convert single use scripts to a commandline interface
+3. Add unit tests
+4. Add stress tests
+
+
+# Next steps
+After finishing TODO items 1 and 2, I'll probably go look for a raspberry pi zero w and a couple of sensors, so I 
+can start "Audrey II" project.
