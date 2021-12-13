@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+message sensor_reading_request {
+  string sensor_id = 1;
+  string reading_location_id = 2;
+  float reading_value = 3;
+}
+
+message sensor_reading_response {
+  string reading_id = 1;
+  bool success = 2;
+  string error_message = 3;
+}
+
+message sensor_reading_fetch_request {
+  string reading_id = 1;
+}
+
+message sensor_reading_fetch_item_response {
+  string sensor_reading_item = 1;
+  bool success = 2;
+  string error_message = 3;
+}
+
+message sensor_reading_item {
+  string id = 1;
+  string sensor_id = 2;
+  string reading_location_id = 3;
+  float reading_value = 4;
+  bool trusted_reading = 5;
+  bool location_known = 6;
+  bool location_accurate = 7;
+  bool is_processed = 8;
+  string read_at = 9;
+  string updated_at = 10;
+  string received_at = 11;
+  float overall_integrity = 12;
+}
+
+message sensor_reading_fetch_response {
+  repeated sensor_reading_item sensor_readings = 1;
+  bool success = 2;
+  string error_message = 3;
+}
+
+message no_parameter {}
+
+service SensorService {
+  rpc save_reading(sensor_reading_request) returns (sensor_reading_response) {}
+  rpc get_readings(no_parameter) returns (sensor_reading_fetch_response) {}
+  rpc get_reading(sensor_reading_fetch_request) returns (sensor_reading_fetch_item_response) {}
+}

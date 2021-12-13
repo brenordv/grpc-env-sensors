@@ -1,0 +1,7 @@
+grpcio == 1.42.0
+grpcio-tools == 1.42.0
+asyncio == 3.4.3
+requests == 2.26.0
+ZODB == 5.6.0
+persistent == 4.7.0
+transaction == 3.0.1
