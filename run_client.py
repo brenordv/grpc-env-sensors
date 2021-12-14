@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import random
-import logging
 from client.sensor_client import SensorClient
+from core.settings import configure_application_logging
 
 
 def send_readings():
-    # https://www.velotio.com/engineering-blog/grpc-implementation-using-python
     client = SensorClient()
     for i in range(5):
         sensor_id = f"S{i}"
@@ -33,6 +32,6 @@ def get_all_readings():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    configure_application_logging()
     send_readings()
     get_all_readings()

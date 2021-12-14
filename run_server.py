@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-import logging
-import os
-
 from core.entities.location import Location
 from core.entities.sensor import Sensor
 from core.services.storage_service import StorageService
+from core.settings import configure_application_logging
 from server import sensor_server
 
 
@@ -37,8 +35,7 @@ def start_sensor_server():
 
 
 if __name__ == '__main__':
-    # Configures logging level.
-    logging.basicConfig(level=logging.INFO)
+    configure_application_logging()
 
     add_test_sensors_and_locations()
     start_sensor_server()
