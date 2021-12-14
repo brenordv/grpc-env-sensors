@@ -2,15 +2,17 @@
 from typing import Union
 import persistent
 
+from core import validators
+
 
 class Sensor(persistent.Persistent):
     def __init__(self,
                  sensor_id: str,
                  location_id: str,
                  sensor_name: str):
-        self.__id__: Union[str, None] = None
-        self.__location_id__: Union[str, None] = None
-        self.__sensor_name__: Union[str, None] = None
+        self._id: Union[str, None] = None
+        self._location_id: Union[str, None] = None
+        self._sensor_name: Union[str, None] = None
 
         self.id = sensor_id
         self.location_id = location_id
@@ -21,33 +23,30 @@ class Sensor(persistent.Persistent):
 
     @property
     def id(self) -> str:
-        return self.__id__
+        return self._id
 
     @id.setter
     def id(self, value: str) -> None:
-        if value is None or value.strip() == "":
-            raise ValueError("Sensor Id cannot be null")
+        validators.is_str_not_null_or_empty(value, "sensor id")
 
-        self.__id__ = value
+        self._id = value
 
     @property
     def location_id(self) -> str:
-        return self.__location_id__
+        return self._location_id
 
     @location_id.setter
     def location_id(self, value: str) -> None:
-        if value is None or value.strip() == "":
-            raise ValueError("Location Id cannot be null")
+        validators.is_str_not_null_or_empty(value, "location id")
 
-        self.__location_id__ = value
+        self._location_id = value
 
     @property
     def sensor_name(self) -> str:
-        return self.__sensor_name__
+        return self._sensor_name
 
     @sensor_name.setter
     def sensor_name(self, value: str) -> None:
-        if value is None or value.strip() == "":
-            raise ValueError("Sensor Name cannot be null")
+        validators.is_str_not_null_or_empty(value, "sensor name")
 
-        self.__sensor_name__ = value
+        self._sensor_name = value

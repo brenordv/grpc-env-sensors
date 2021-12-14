@@ -2,13 +2,15 @@
 from typing import Union
 import persistent
 
+from core import validators
+
 
 class Location(persistent.Persistent):
     def __init__(self,
                  location_id: str,
                  location_name: str):
-        self.__id__: Union[str, None] = None
-        self.__location_name__: Union[str, None] = None
+        self._id: Union[str, None] = None
+        self._location_name: Union[str, None] = None
 
         self.id = location_id
         self.name = location_name
@@ -18,22 +20,20 @@ class Location(persistent.Persistent):
 
     @property
     def id(self) -> str:
-        return self.__id__
+        return self._id
 
     @id.setter
     def id(self, value: str) -> None:
-        if value is None or value.strip() == "":
-            raise ValueError("Location Id cannot be null")
+        validators.is_str_not_null_or_empty(value, "location id")
 
-        self.__id__ = value
+        self._id = value
 
     @property
     def name(self) -> str:
-        return self.__location_name__
+        return self._location_name
 
     @name.setter
     def name(self, value: str) -> None:
-        if value is None or value.strip() == "":
-            raise ValueError("Location Name cannot be null")
+        validators.is_str_not_null_or_empty(value, "location name")
 
-        self.__location_name__ = value
+        self._location_name = value

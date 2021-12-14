@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Union
 import persistent
 
-from core.utils import is_valid_guid
+from core import validators
 
 
 class SensorReading(persistent.Persistent):
@@ -63,11 +63,8 @@ class SensorReading(persistent.Persistent):
 
     @sensor_id.setter
     def sensor_id(self, value: str) -> None:
-        if value is None or value.strip() == "":
-            raise ValueError("Sensor Id cannot be null")
-
-        if not isinstance(value, str):
-            raise TypeError(f"Sensor Id value must be a string. Got '{type(value).__name__}'")
+        label = "sensor id"
+        validators.is_str_not_null_or_empty(value, label)
 
         self._sensor_id = value
 
@@ -77,11 +74,8 @@ class SensorReading(persistent.Persistent):
 
     @reading_location_id.setter
     def reading_location_id(self, value: str) -> None:
-        if value is None or value.strip() == "":
-            raise ValueError("Reading Location Id cannot be null")
-
-        if not isinstance(value, str):
-            raise TypeError(f"Reading Location Id value must be a string. Got '{type(value).__name__}'")
+        label = "reading location id"
+        validators.is_str_not_null_or_empty(value, label)
 
         self._reading_location_id = value
         self._change_updated_at()
@@ -92,11 +86,9 @@ class SensorReading(persistent.Persistent):
 
     @reading_value.setter
     def reading_value(self, value: float) -> None:
-        if value is None:
-            raise ValueError("Reading Value cannot be null")
-
-        if not isinstance(value, float):
-            raise TypeError(f"Reading Value must be a float. Got '{type(value).__name__}'")
+        label = "reading value"
+        validators.is_not_null(value, label)
+        validators.is_of_type(value, float, label)
 
         self._reading_value = value
         self._change_updated_at()
@@ -107,11 +99,9 @@ class SensorReading(persistent.Persistent):
 
     @is_trusted_reading.setter
     def is_trusted_reading(self, value: bool) -> None:
-        if value is None:
-            raise ValueError("Is Trusted Reading flag cannot be null")
-
-        if not isinstance(value, bool):
-            raise TypeError(f"Is Trusted Reading flag must be a bool. Got '{type(value).__name__}'")
+        label = "is trusted reading"
+        validators.is_not_null(value, label)
+        validators.is_of_type(value, bool, label)
 
         self._is_trusted_reading = value
         self._change_updated_at()
@@ -122,14 +112,9 @@ class SensorReading(persistent.Persistent):
 
     @id.setter
     def id(self, value: str) -> None:
-        if value is None or value.strip() == "":
-            raise ValueError("Reading Id cannot be null")
-
-        if not isinstance(value, str):
-            raise TypeError(f"Reading Id value must be a string. Got '{type(value).__name__}'")
-
-        if not is_valid_guid(value):
-            raise ValueError("Reading Id must be a valid guid (UUID4)")
+        label = "reading id"
+        validators.is_str_not_null_or_empty(value, label)
+        validators.is_valid_guid(value, label)
 
         if self._id is not None and self._id != value:
             raise ValueError(f"Reading Id is set to '{self._id}' and cannot be changed (to '{value}')")
@@ -143,11 +128,9 @@ class SensorReading(persistent.Persistent):
 
     @is_location_known.setter
     def is_location_known(self, value: bool) -> None:
-        if value is None:
-            raise ValueError("Is Location Known flag cannot be null")
-
-        if not isinstance(value, bool):
-            raise TypeError(f"Is Location Known flag must be a bool. Got '{type(value).__name__}'")
+        label = "is location known flag"
+        validators.is_not_null(value, label)
+        validators.is_of_type(value, bool, label)
 
         self._is_location_known = value
         self._change_updated_at()
@@ -158,11 +141,9 @@ class SensorReading(persistent.Persistent):
 
     @is_location_accurate.setter
     def is_location_accurate(self, value: bool) -> None:
-        if value is None:
-            raise ValueError("Is Location Accurate flag cannot be null")
-
-        if not isinstance(value, bool):
-            raise TypeError(f"Is Location Accurate flag must be a bool. Got '{type(value).__name__}'")
+        label = "is location accurate flag"
+        validators.is_not_null(value, label)
+        validators.is_of_type(value, bool, label)
 
         self._is_location_accurate = value
         self._change_updated_at()
@@ -177,11 +158,9 @@ class SensorReading(persistent.Persistent):
 
     @received_at.setter
     def received_at(self, value: datetime) -> None:
-        if value is None:
-            raise ValueError("Received at datetime cannot be null")
-
-        if not isinstance(value, datetime):
-            raise TypeError(f"Received at value must be a datetime. Got '{type(value).__name__}'")
+        label = "received at timestamp"
+        validators.is_not_null(value, label)
+        validators.is_of_type(value, datetime, label)
 
         if self._received_at is not None:
             raise ValueError("Cannot change received at datetime")
@@ -198,11 +177,9 @@ class SensorReading(persistent.Persistent):
 
     @is_processed.setter
     def is_processed(self, value: bool) -> None:
-        if value is None:
-            raise ValueError("Is Processed flag cannot be null")
-
-        if not isinstance(value, bool):
-            raise TypeError(f"Is Processed flag must be a bool. Got '{type(value).__name__}'")
+        label = "is processed flag"
+        validators.is_not_null(value, label)
+        validators.is_of_type(value, bool, label)
 
         self._is_processed = value
         self._change_updated_at()
@@ -213,14 +190,10 @@ class SensorReading(persistent.Persistent):
 
     @overall_integrity.setter
     def overall_integrity(self, value: float) -> None:
-        if value is None:
-            raise ValueError("Overall integrity cannot be null")
-
-        if not isinstance(value, float):
-            raise TypeError(f"Overall integrity must be a float. Got '{type(value).__name__}'")
-
-        if value < 0.0 or value > 1.0:
-            raise ValueError(f"Overall Integrity must be between 0 (0%) and 1 (100%). Got {value}")
+        label = "overall integrity"
+        validators.is_not_null(value, label)
+        validators.is_of_type(value, float, label)
+        validators.is_number_between(value, 0.0, 1.0, label)
 
         self._overall_integrity = value
 

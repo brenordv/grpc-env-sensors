@@ -5,14 +5,6 @@ from typing import Union
 from uuid import UUID
 
 
-def is_valid_guid(guid: str) -> bool:
-    try:
-        uuid_obj = UUID(guid, version=4)
-    except ValueError:
-        return False
-    return str(uuid_obj) == guid
-
-
 class StopWatch(object):
     """ StopWatch
 
