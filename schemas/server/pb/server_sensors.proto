@@ -1,25 +1,22 @@
 syntax = "proto3";
 
-message sensor_reading_request {
+message no_parameter {}
+
+message base_operation_result {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message new_sensor_reading_save_request {
   string sensor_id = 1;
   string reading_location_id = 2;
   float reading_value = 3;
+  string read_at = 4;
 }
 
-message sensor_reading_response {
+message new_sensor_reading_save_response {
   string reading_id = 1;
-  bool success = 2;
-  string error_message = 3;
-}
-
-message sensor_reading_fetch_request {
-  string reading_id = 1;
-}
-
-message sensor_reading_fetch_item_response {
-  string sensor_reading_item = 1;
-  bool success = 2;
-  string error_message = 3;
+  base_operation_result result = 2;
 }
 
 message sensor_reading_item {
@@ -37,16 +34,23 @@ message sensor_reading_item {
   float overall_integrity = 12;
 }
 
-message sensor_reading_fetch_response {
-  repeated sensor_reading_item sensor_readings = 1;
-  bool success = 2;
-  string error_message = 3;
+message sensor_reading_fetch_single_item_request {
+  string reading_id = 1;
 }
 
-message no_parameter {}
+message sensor_reading_fetch_single_item_response {
+  sensor_reading_item item = 1;
+  base_operation_result result = 2;
+}
+
+message sensor_reading_fetch_multi_item_response {
+  repeated sensor_reading_item items = 1;
+  double item_count = 2;
+  base_operation_result result = 3;
+}
 
 service SensorService {
-  rpc save_reading(sensor_reading_request) returns (sensor_reading_response) {}
-  rpc get_readings(no_parameter) returns (sensor_reading_fetch_response) {}
-  rpc get_reading(sensor_reading_fetch_request) returns (sensor_reading_fetch_item_response) {}
+  rpc save_reading(new_sensor_reading_save_request) returns (new_sensor_reading_save_response) {}
+  rpc get_readings(no_parameter) returns (sensor_reading_fetch_multi_item_response) {}
+  rpc get_reading(sensor_reading_fetch_single_item_request) returns (sensor_reading_fetch_single_item_response) {}
 }
