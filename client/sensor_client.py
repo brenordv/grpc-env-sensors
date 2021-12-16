@@ -6,6 +6,7 @@ from datetime import datetime
 import server.pb.server_sensors_pb2 as pb2
 import server.pb.server_sensors_pb2_grpc as pb2_grpc
 from core import converters
+from core.converters import KnownTypes
 from core.utils import StopWatch
 
 
@@ -25,12 +26,12 @@ class SensorClient(object):
                          sensor_id: str, reading_location_id: str, reading_value: float, read_at: datetime) -> dict:
         logging.info("[CLIENT] Sending request to save new reading!")
         timer = StopWatch(True)
-        reading = converters._from_values_to_proto_new_sensor_reading_save_request(
-            sensor_id=sensor_id,
-            reading_location_id=reading_location_id,
-            reading_value=reading_value,
-            read_at=read_at
-        )
+        reading = converters.From({
+            "sensor_id": sensor_id,
+            "reading_location_id": reading_location_id,
+            "reading_value": reading_value,
+            "read_at": read_at
+        }).to(KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST)
 
         response = self.__stub__.save_reading(reading)
         result = {
@@ -54,8 +55,7 @@ class SensorClient(object):
 
         if response.result.success:
             logging.info("[CLIENT] Success getting all readings.")
-            payload = [converters._from_proto_sensor_reading_fetch_single_item_response_to_sensor_reading(reading) for
-                       reading in response.items]
+            payload = [converters.From(reading).to(KnownTypes.SENSOR_READING) for reading in response.items]
         else:
             logging.error(f"[CLIENT] Failed to get all readings. Error: {response.result.error_message}")
             payload = None
@@ -76,7 +76,10 @@ class SensorClient(object):
 
         if response.result.success:
             logging.info("[CLIENT] Success getting reading.")
-            payload = converters._from_proto_sensor_reading_fetch_single_item_response_to_sensor_reading(response.item)
+            if response.result.error_message is None or response.result.error_message != "":
+                payload = None
+            else:
+                payload = converters.From(response.item).to(KnownTypes.SENSOR_READING)
         else:
             logging.warning(f"[CLIENT] Failed to get reading with id '{reading_id}'. "
                             f"Error: {response.result.error_message}")

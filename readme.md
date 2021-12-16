@@ -25,7 +25,7 @@ Also, all entities have read-only properties and validation on setters, to make 
 You use the current scripts:
 1. `run_server.py`: starts the gRPC server
 2. `run_client.py`: sends random readings to the server and then fetches (and prints) all readings
-3. _add flask start script_
+3. `run_api.py`: starts the flask API
 
 
 # Big picture
@@ -36,10 +36,12 @@ You use the current scripts:
 
 # TODO
 0. Lots of refactoring...
-1. Create flask interface
-2. Convert single use scripts to a commandline interface
-3. Add unit tests
-4. Add stress tests
+1. Add post route for adding sensor_reading
+2. Standardize fetch base result to include item count and is_empty property
+3. Create flask interface
+4. Convert single use scripts to a commandline interface
+5. Add unit tests
+6. Add stress tests
 
 
 # Next steps

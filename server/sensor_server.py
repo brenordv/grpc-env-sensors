@@ -29,12 +29,12 @@ class SensorServer(pb2_grpc.SensorService):
                 result=converters.From({
                         "success": False,
                         "error_message": "cannot persist or update a null reading"
-                    }).to(KnownTypes.base_operation_result)
+                    }).to(KnownTypes.BASE_OPERATION_RESULT)
             )
         logging.info("[SERVER] Save reading requested!")
         timer = StopWatch(True)
 
-        reading = converters.From(request).to(KnownTypes.sensor_reading)
+        reading = converters.From(request).to(KnownTypes.SENSOR_READING)
         reading.received_at = datetime.utcnow()
 
         logging.info(f"[SERVER] Persisting reading: {reading}")
@@ -55,7 +55,7 @@ class SensorServer(pb2_grpc.SensorService):
         timer = StopWatch(True)
         readings = self._storage_service.get_readings()
 
-        proto_readings = [converters.From(reading).to(KnownTypes.sensor_reading_item) for reading in readings]
+        proto_readings = [converters.From(reading).to(KnownTypes.SENSOR_READING_ITEM) for reading in readings]
         logging.info(f"[SERVER] Get all readings done. Elapsed time: {timer.end()}")
         return pb2.sensor_reading_fetch_multi_item_response(
             items=proto_readings,
@@ -76,7 +76,7 @@ class SensorServer(pb2_grpc.SensorService):
                 result=converters.From({
                     "success": False,
                     "error_message": "no id was provided to search for sensor reading"
-                }).to(KnownTypes.base_operation_result)
+                }).to(KnownTypes.BASE_OPERATION_RESULT)
             )
 
         reading = self._storage_service.get_reading(reading_id)
@@ -84,13 +84,13 @@ class SensorServer(pb2_grpc.SensorService):
             result = pb2.sensor_reading_fetch_single_item_response(
                 item=None,
                 result=converters.From({
-                    "success": False,
+                    "success": True,
                     "error_message": f"no sensor reading found with id: '{reading_id}'"
-                }).to(KnownTypes.base_operation_result)
+                }).to(KnownTypes.BASE_OPERATION_RESULT)
             )
 
         else:
-            result_item = converters.From(reading).to(KnownTypes.sensor_reading_item)
+            result_item = converters.From(reading).to(KnownTypes.SENSOR_READING_ITEM)
             result = pb2.sensor_reading_fetch_single_item_response(
                 item=result_item,
                 result=converters.build_success_result()

@@ -97,3 +97,16 @@ class StopWatch(object):
 def iso8601_str_to_datetime(str_dt: str) -> datetime:
     iso8601_format = "%Y-%m-%dT%H:%M:%S.%f"
     return datetime.strptime(str_dt, iso8601_format) if str_dt is not None and str_dt.strip() not in ("", "-") else None
+
+
+def merge_dicts(a: dict, b: dict) -> dict:
+    for key, item in a.items():
+        if isinstance(item, dict):
+            a[key] = merge_dicts(item, b.get(key, {}))
+        else:
+            val = b.get(key)
+            if val is None:
+                continue
+            a[key] = item
+
+    return a

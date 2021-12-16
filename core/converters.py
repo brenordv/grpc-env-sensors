@@ -8,27 +8,12 @@ from core.entities.sensor_reading import SensorReading
 from core.utils import iso8601_str_to_datetime
 
 
-class OperationTypes(Enum):
-    request = 1
-    response = 2
-
-
 class KnownTypes(Enum):
-    values = 1
-    sensor_reading = 2
-    sensor_reading_item = 3
-    new_sensor_reading_save_request = 4
-    base_operation_result = 5
-
-
-class ConvertOperations(Enum):
-    new_reading_request = 1
-    new_reading_response = 2
-    read_one_request = 3
-    read_one_response = 4
-    read_multi_request = 5
-    read_multi_response = 6
-    sensor_reading_entity = 7
+    VALUES = 1
+    SENSOR_READING = 2
+    SENSOR_READING_ITEM = 3
+    NEW_SENSOR_READING_SAVE_REQUEST = 4
+    BASE_OPERATION_RESULT = 5
 
 
 class From(object):
@@ -39,36 +24,36 @@ class From(object):
     @staticmethod
     def _get_conversion_type(input_value) -> KnownTypes:
         if isinstance(input_value, dict):
-            return KnownTypes.values
+            return KnownTypes.VALUES
 
         elif isinstance(input_value, SensorReading):
-            return KnownTypes.sensor_reading
+            return KnownTypes.SENSOR_READING
 
         elif isinstance(input_value, pb2.sensor_reading_item):
-            return KnownTypes.sensor_reading_item
+            return KnownTypes.SENSOR_READING_ITEM
 
         elif isinstance(input_value, pb2.new_sensor_reading_save_request):
-            return KnownTypes.new_sensor_reading_save_request
+            return KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST
 
         raise TypeError(f"type '{type(input_value).__name__}' is unknown")
 
     def to(self, new_type: KnownTypes):
-        if self._type == KnownTypes.values and new_type == KnownTypes.sensor_reading:
+        if self._type == KnownTypes.VALUES and new_type == KnownTypes.SENSOR_READING:
             return _from_values_to_sensor_reading(**self._value)
 
-        elif self._type == KnownTypes.values and new_type == KnownTypes.new_sensor_reading_save_request:
+        elif self._type == KnownTypes.VALUES and new_type == KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST:
             return _from_values_to_proto_new_sensor_reading_save_request(**self._value)
 
-        elif self._type == KnownTypes.values and new_type == KnownTypes.base_operation_result:
+        elif self._type == KnownTypes.VALUES and new_type == KnownTypes.BASE_OPERATION_RESULT:
             return _from_values_to_proto_base_operation_result(**self._value)
 
-        elif self._type == KnownTypes.sensor_reading_item and new_type == KnownTypes.sensor_reading:
+        elif self._type == KnownTypes.SENSOR_READING_ITEM and new_type == KnownTypes.SENSOR_READING:
             return _from_proto_sensor_reading_fetch_single_item_response_to_sensor_reading(self._value)
 
-        elif self._type == KnownTypes.new_sensor_reading_save_request and new_type == KnownTypes.sensor_reading:
+        elif self._type == KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST and new_type == KnownTypes.SENSOR_READING:
             return _from_proto_new_sensor_reading_save_request_to_sensor_reading(self._value)
 
-        elif self._type == KnownTypes.sensor_reading and new_type == KnownTypes.sensor_reading_item:
+        elif self._type == KnownTypes.SENSOR_READING and new_type == KnownTypes.SENSOR_READING_ITEM:
             return _from_sensor_reading_to_proto_sensor_reading_fetch_multi_item_response(self._value)
 
         raise TypeError(f"don't know how to convert from '{self._type}' to '{new_type}'")
@@ -78,7 +63,7 @@ def build_success_result():
     return From({
         "success": True,
         "error_message": None
-    }).to(KnownTypes.base_operation_result)
+    }).to(KnownTypes.BASE_OPERATION_RESULT)
 
 
 def _from_sensor_reading_to_proto_sensor_reading_fetch_multi_item_response(
