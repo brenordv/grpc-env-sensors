@@ -1,4 +1,14 @@
 # Environment Sensor Data Processor
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
+
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=bugs)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
+
 I’m used to working in projects where the system receives tons of data (readings) from various environment sensors and 
 then decide to act, depending on what it is receiving.
 
