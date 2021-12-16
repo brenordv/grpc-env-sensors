@@ -46,12 +46,13 @@ You use the current scripts:
 
 # TODO
 0. Lots of refactoring...
-1. Add post route for adding sensor_reading
-2. Standardize fetch base result to include item count and is_empty property
-3. Create flask interface
-4. Convert single use scripts to a commandline interface
-5. Add unit tests
-6. Add stress tests
+1. Create flask interface (in progress)
+2. Add post route for adding sensor_reading
+3. Standardize fetch base result to include item count and is_empty property
+4. Add swagger to flask interface
+5. Convert single use scripts to a commandline interface
+6. Add unit tests
+7. Add stress tests
 
 
 # Next steps
