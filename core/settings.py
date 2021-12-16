@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+from json import JSONDecodeError
 from pathlib import Path
 from os import makedirs
 import copy
@@ -24,7 +25,7 @@ if not APP_DATA_FOLDER.exists():
 
 try:
     SETTINGS = json.loads(json.dumps(DEFAULT_SETTINGS))
-except:
+except (TypeError, ValueError, JSONDecodeError):
     SETTINGS = copy.deepcopy(DEFAULT_SETTINGS)
 
 if SETTINGS_FILE.exists():
