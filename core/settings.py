@@ -25,7 +25,7 @@ if not APP_DATA_FOLDER.exists():
 
 try:
     SETTINGS = json.loads(json.dumps(DEFAULT_SETTINGS))
-except (TypeError, ValueError, JSONDecodeError):
+except (TypeError, ValueError):
     SETTINGS = copy.deepcopy(DEFAULT_SETTINGS)
 
 if SETTINGS_FILE.exists():
