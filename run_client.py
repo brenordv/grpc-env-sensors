@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 import random
+from datetime import datetime, timedelta
+
 from client.sensor_client import SensorClient
 from core.settings import configure_application_logging
 
 
 def send_readings():
     client = SensorClient()
+    read_time = datetime.utcnow()
     for i in range(5):
+        read_time = read_time + timedelta(minutes=15)
         sensor_id = f"S{i}"
         location_id = f"L{i}"
         reading_value = random.uniform(0.42, 10.77)
@@ -14,7 +18,8 @@ def send_readings():
         result = client.save_new_reading(
             sensor_id=sensor_id,
             reading_location_id=location_id,
-            reading_value=reading_value
+            reading_value=reading_value,
+            read_at=read_time
         )
 
         print(f" | Success: {result.get('success', 'Not found')} -- Reading Id: {result.get('payload', 'no payload')}")

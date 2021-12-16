@@ -2,7 +2,6 @@
 from datetime import datetime, timedelta
 from timeit import default_timer as timer
 from typing import Union
-from uuid import UUID
 
 
 class StopWatch(object):
@@ -93,3 +92,8 @@ class StopWatch(object):
         self.__end_timer__ = timer()
 
         return self.elapsed(raw=raw)
+
+
+def iso8601_str_to_datetime(str_dt: str) -> datetime:
+    iso8601_format = "%Y-%m-%dT%H:%M:%S.%f"
+    return datetime.strptime(str_dt, iso8601_format) if str_dt is not None and str_dt.strip() not in ("", "-") else None

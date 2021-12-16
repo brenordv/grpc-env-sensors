@@ -16,18 +16,18 @@ class SensorServiceStub(object):
         """
         self.save_reading = channel.unary_unary(
                 '/SensorService/save_reading',
-                request_serializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_request.SerializeToString,
-                response_deserializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_response.FromString,
+                request_serializer=server_dot_pb_dot_server__sensors__pb2.new_sensor_reading_save_request.SerializeToString,
+                response_deserializer=server_dot_pb_dot_server__sensors__pb2.new_sensor_reading_save_response.FromString,
                 )
         self.get_readings = channel.unary_unary(
                 '/SensorService/get_readings',
                 request_serializer=server_dot_pb_dot_server__sensors__pb2.no_parameter.SerializeToString,
-                response_deserializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_response.FromString,
+                response_deserializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_multi_item_response.FromString,
                 )
         self.get_reading = channel.unary_unary(
                 '/SensorService/get_reading',
-                request_serializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_request.SerializeToString,
-                response_deserializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_item_response.FromString,
+                request_serializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_single_item_request.SerializeToString,
+                response_deserializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_single_item_response.FromString,
                 )
 
 
@@ -57,18 +57,18 @@ def add_SensorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'save_reading': grpc.unary_unary_rpc_method_handler(
                     servicer.save_reading,
-                    request_deserializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_request.FromString,
-                    response_serializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_response.SerializeToString,
+                    request_deserializer=server_dot_pb_dot_server__sensors__pb2.new_sensor_reading_save_request.FromString,
+                    response_serializer=server_dot_pb_dot_server__sensors__pb2.new_sensor_reading_save_response.SerializeToString,
             ),
             'get_readings': grpc.unary_unary_rpc_method_handler(
                     servicer.get_readings,
                     request_deserializer=server_dot_pb_dot_server__sensors__pb2.no_parameter.FromString,
-                    response_serializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_response.SerializeToString,
+                    response_serializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_multi_item_response.SerializeToString,
             ),
             'get_reading': grpc.unary_unary_rpc_method_handler(
                     servicer.get_reading,
-                    request_deserializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_request.FromString,
-                    response_serializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_item_response.SerializeToString,
+                    request_deserializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_single_item_request.FromString,
+                    response_serializer=server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_single_item_response.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -92,8 +92,8 @@ class SensorService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/SensorService/save_reading',
-            server_dot_pb_dot_server__sensors__pb2.sensor_reading_request.SerializeToString,
-            server_dot_pb_dot_server__sensors__pb2.sensor_reading_response.FromString,
+            server_dot_pb_dot_server__sensors__pb2.new_sensor_reading_save_request.SerializeToString,
+            server_dot_pb_dot_server__sensors__pb2.new_sensor_reading_save_response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -110,7 +110,7 @@ class SensorService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/SensorService/get_readings',
             server_dot_pb_dot_server__sensors__pb2.no_parameter.SerializeToString,
-            server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_response.FromString,
+            server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_multi_item_response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -126,7 +126,7 @@ class SensorService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/SensorService/get_reading',
-            server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_request.SerializeToString,
-            server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_item_response.FromString,
+            server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_single_item_request.SerializeToString,
+            server_dot_pb_dot_server__sensors__pb2.sensor_reading_fetch_single_item_response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
