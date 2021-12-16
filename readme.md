@@ -35,6 +35,7 @@ You use the current scripts:
 
 
 # TODO
+0. Lots of refactoring...
 1. Create flask interface
 2. Convert single use scripts to a commandline interface
 3. Add unit tests
