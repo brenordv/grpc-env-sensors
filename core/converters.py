@@ -3,6 +3,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Union
 
+import dateutil.parser
+
 import server.pb.server_sensors_pb2 as pb2
 from core.entities.sensor_reading import SensorReading
 from core.utils import iso8601_str_to_datetime
@@ -144,6 +146,9 @@ def _from_values_to_proto_new_sensor_reading_save_request(sensor_id: str,
                                                           reading_location_id: str,
                                                           reading_value: float,
                                                           read_at: datetime) -> pb2.new_sensor_reading_save_request:
+    if isinstance(read_at, str):
+        read_at = dateutil.parser.isoparse(read_at)
+
     return pb2.new_sensor_reading_save_request(
         sensor_id=sensor_id,
         reading_location_id=reading_location_id,

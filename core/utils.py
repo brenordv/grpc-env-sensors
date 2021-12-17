@@ -3,6 +3,10 @@ from datetime import datetime, timedelta
 from timeit import default_timer as timer
 from typing import Union
 
+import dateutil.parser
+
+from core.settings import POST_REQUEST_KEYS
+
 
 class StopWatch(object):
     """ StopWatch
@@ -95,8 +99,7 @@ class StopWatch(object):
 
 
 def iso8601_str_to_datetime(str_dt: str) -> datetime:
-    iso8601_format = "%Y-%m-%dT%H:%M:%S.%f"
-    return datetime.strptime(str_dt, iso8601_format) if str_dt is not None and str_dt.strip() not in ("", "-") else None
+    return dateutil.parser.isoparse(str_dt) if str_dt is not None and str_dt.strip() not in ("", "-") else None
 
 
 def merge_dicts(a: dict, b: dict) -> dict:
@@ -110,3 +113,11 @@ def merge_dicts(a: dict, b: dict) -> dict:
             a[key] = item
 
     return a
+
+
+def sanitize_post_save_reading(body):
+    sanitized = {}
+    for key in POST_REQUEST_KEYS:
+        sanitized[key] = body[key]
+
+    return sanitized

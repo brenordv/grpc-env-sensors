@@ -6,6 +6,7 @@ from pathlib import Path
 from os import makedirs
 import copy
 
+POST_REQUEST_KEYS = ["sensor_id", "reading_location_id", "reading_value", "read_at"]
 ROOT_APP_PATH = Path(__file__).parent.parent
 SETTINGS_FILE = ROOT_APP_PATH.joinpath("settings.json")
 APP_DATA_FOLDER = ROOT_APP_PATH.joinpath(".app")

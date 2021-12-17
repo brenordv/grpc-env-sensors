@@ -4,7 +4,7 @@ from core.settings import SETTINGS
 
 
 def main():
-    app.run(**SETTINGS["api"])
+    app.run(**SETTINGS["api"], )
 
 
 if __name__ == '__main__':

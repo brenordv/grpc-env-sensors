@@ -36,7 +36,22 @@ You use the current scripts:
 1. `run_server.py`: starts the gRPC server
 2. `run_client.py`: sends random readings to the server and then fetches (and prints) all readings
 3. `run_api.py`: starts the flask API
+4. `run_send_api_request.py`: sends a post request to the API
 
+## Performance
+- *Update 16/12/2021*: I used the IDE (PyCharm) to run the gRPC server AND the API at the same time. To make the requests I used another 
+application I made using GoLang and the result was: 578 requests processed each second. It's a good first start, but I 
+believe I can do better.
+
+```shell
+go-Request!::POST
+Your session id is: 59028850-6238-4601-9a92-bd51a313c667
+Making POST requests 100% |████████████████████████████████████████████████████████████████| (5000/5000, 578 it/s)
+Done! Elapsed time: 8.6464703s
+
+Process finished with the exit code 0
+
+```
 
 # Big picture
 - Clients, services, private apis and other clients can access teh gRPC endpoints.
