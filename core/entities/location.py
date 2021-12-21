@@ -6,12 +6,12 @@ from core import validators
 
 
 class Location(persistent.Persistent):
+    _id: Union[str, None] = None
+    _location_name: Union[str, None] = None
+
     def __init__(self,
                  location_id: str,
                  location_name: str):
-        self._id: Union[str, None] = None
-        self._location_name: Union[str, None] = None
-
         self.id = location_id
         self.name = location_name
 

@@ -23,81 +23,114 @@ class SensorServer(pb2_grpc.SensorService):
     def save_reading(self, request: pb2.new_sensor_reading_save_request, target, options=(),
                      channel_credentials=None, call_credentials=None, insecure=False, compression=None,
                      wait_for_ready=None, timeout=None, metadata=None) -> pb2.new_sensor_reading_save_response:
-        if request is None:
-            return pb2.new_sensor_reading_save_response(
-                reading_id=None,
-                result=converters.From({
+        timer = StopWatch(True)
+        error_msg = ''
+        persisted_msg = ''
+        try:
+            if request is None:
+                error_msg = " | Error messages: cannot persist or update a null reading"
+                return pb2.new_sensor_reading_save_response(
+                    reading_id=None,
+                    result=converters.From({
                         "success": False,
                         "error_message": "cannot persist or update a null reading"
                     }).to(KnownTypes.BASE_OPERATION_RESULT)
+                )
+
+            timer = StopWatch(True)
+
+            reading = converters.From(request).to(KnownTypes.SENSOR_READING)
+            reading.received_at = datetime.utcnow()
+
+            self._storage_service.upsert_reading(reading)
+
+            persisted_msg = f" | Reading: {reading}"
+
+            return pb2.new_sensor_reading_save_response(
+                reading_id=reading.id,
+                result=converters.build_success_result()
             )
-        logging.info("[SERVER] Save reading requested!")
-        timer = StopWatch(True)
 
-        reading = converters.From(request).to(KnownTypes.SENSOR_READING)
-        reading.received_at = datetime.utcnow()
+        except Exception as e:
+            error_msg = f" | Error messages: {e}"
+            raise
 
-        logging.info(f"[SERVER] Persisting reading: {reading}")
-        self._storage_service.upsert_reading(reading)
-
-        logging.info(f"[SERVER] Save reading done. Elapsed time: {timer.end()}")
-
-        return pb2.new_sensor_reading_save_response(
-            reading_id=reading.id,
-            result=converters.build_success_result()
-        )
+        finally:
+            logging.info(f"[SERVER] Save reading done. Elapsed time: {timer.end()}{persisted_msg}{error_msg}")
 
     def get_readings(self,
                      request: pb2.no_parameter, target, options=(),
                      channel_credentials=None, call_credentials=None, insecure=False, compression=None,
                      wait_for_ready=None, timeout=None, metadata=None) -> pb2.sensor_reading_fetch_multi_item_response:
-        logging.info("[SERVER] Get all readings requested!")
         timer = StopWatch(True)
-        readings = self._storage_service.get_readings()
+        error_msg = ''
+        read_count = ''
 
-        proto_readings = [converters.From(reading).to(KnownTypes.SENSOR_READING_ITEM) for reading in readings]
-        logging.info(f"[SERVER] Get all readings done. Elapsed time: {timer.end()}")
-        return pb2.sensor_reading_fetch_multi_item_response(
-            items=proto_readings,
-            item_count=len(proto_readings),
-            result=converters.build_success_result()
-        )
+        try:
+            readings = self._storage_service.get_readings()
+            proto_readings = [converters.From(reading).to(KnownTypes.SENSOR_READING_ITEM) for reading in readings]
+            read_count = f" | Found '{len(proto_readings)}' items."
+
+            return pb2.sensor_reading_fetch_multi_item_response(
+                items=proto_readings,
+                item_count=len(proto_readings),
+                result=converters.build_success_result()
+            )
+
+        except Exception as e:
+            error_msg = f" | Error messages: {e}"
+            raise
+
+        finally:
+            logging.info(f"[SERVER] Get all readings done. Elapsed time: {timer.end()}{read_count}{error_msg}")
 
     def get_reading(self, request: pb2.sensor_reading_fetch_single_item_request, target, options=(),
                     channel_credentials=None, call_credentials=None, insecure=False, compression=None,
                     wait_for_ready=None, timeout=None, metadata=None) -> pb2.sensor_reading_fetch_single_item_response:
-        logging.info(f"[SERVER] Get reading by id requested!")
         timer = StopWatch(True)
         reading_id = request.reading_id
+        error_msg = ''
+        read_msg = ''
 
-        if reading_id is None:
-            return pb2.sensor_reading_fetch_single_item_response(
-                item=None,
-                result=converters.From({
-                    "success": False,
-                    "error_message": "no id was provided to search for sensor reading"
-                }).to(KnownTypes.BASE_OPERATION_RESULT)
-            )
+        try:
+            if reading_id is None:
+                error_msg = " | Error messages: no id was provided to search for sensor reading"
+                return pb2.sensor_reading_fetch_single_item_response(
+                    item=None,
+                    result=converters.From({
+                        "success": False,
+                        "error_message": "no id was provided to search for sensor reading"
+                    }).to(KnownTypes.BASE_OPERATION_RESULT)
+                )
 
-        reading = self._storage_service.get_reading(reading_id)
-        if reading is None:
-            result = pb2.sensor_reading_fetch_single_item_response(
-                item=None,
-                result=converters.From({
-                    "success": True,
-                    "error_message": f"no sensor reading found with id: '{reading_id}'"
-                }).to(KnownTypes.BASE_OPERATION_RESULT)
-            )
+            reading = self._storage_service.get_reading(reading_id)
+            if reading is None:
+                error_msg = " | Error messages: no sensor reading found with id"
+                result = pb2.sensor_reading_fetch_single_item_response(
+                    item=None,
+                    result=converters.From({
+                        "success": True,
+                        "error_message": f"no sensor reading found with id: '{reading_id}'"
+                    }).to(KnownTypes.BASE_OPERATION_RESULT)
+                )
 
-        else:
-            result_item = converters.From(reading).to(KnownTypes.SENSOR_READING_ITEM)
-            result = pb2.sensor_reading_fetch_single_item_response(
-                item=result_item,
-                result=converters.build_success_result()
-            )
+            else:
+                result_item = converters.From(reading).to(KnownTypes.SENSOR_READING_ITEM)
+                result = pb2.sensor_reading_fetch_single_item_response(
+                    item=result_item,
+                    result=converters.build_success_result()
+                )
 
-        logging.info(f"[SERVER] Getting single reading done. Elapsed time: {timer.end()}")
-        return result
+            read_msg = f" | Read msg: {reading}"
+            return result
+
+        except Exception as e:
+            error_msg = f" | Error messages: {e}"
+            raise
+
+        finally:
+            logging.info(f"[SERVER] Getting read with id '{reading_id}' done. Elapsed time: {timer.end()}{read_msg}"
+                         f"{error_msg}")
 
 
 def serve(wait_for_termination: bool = True, max_workers: int = 10, secure_port: int = 50042,

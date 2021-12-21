@@ -8,42 +8,61 @@ from core import validators
 
 
 class SensorReading(persistent.Persistent):
+    # Id
+    _id: Union[str, None] = None
+
+    # Required values
+    _sensor_id: Union[str, None] = None
+    _reading_location_id: Union[str, None] = None
+    _reading_value: Union[float, None] = None
+
+    # Optional or automatic properties
+    _is_trusted_reading: bool = False
+    _is_location_known: bool = False
+    _is_location_accurate: bool = False
+    _is_processed: bool = False
+    _overall_integrity: float = -1.0
+    _read_at: Union[datetime, None] = None
+    _received_at: Union[datetime, None] = None
+    _updated_at: Union[datetime, None] = None
+
     def __init__(self,
                  sensor_id: str,
                  reading_location_id: str,
                  reading_value: float,
+                 reading_id: Union[str, None] = None,
                  trusted_reading: bool = False,
                  location_known: bool = False,
                  location_accurate: bool = False,
-                 reading_id: Union[str, None] = None,
-                 overall_integrity: float = 0.0,
                  is_processed: bool = False,
+                 overall_integrity: float = 0.0,
                  read_at: Union[datetime, None] = None,
                  received_at: Union[datetime, None] = None,
                  updated_at: Union[datetime, None] = None):
 
-        self._id: Union[str, None] = None
-        self._sensor_id: Union[str, None] = None
-        self._reading_location_id: Union[str, None] = None
-        self._reading_value: Union[float, None] = None
-        self._is_trusted_reading: bool = trusted_reading
-        self._is_location_known: bool = location_known
-        self._is_location_accurate: bool = location_accurate
-        self._is_processed: bool = is_processed
-        self._read_at: Union[datetime, None] = read_at
-        self._received_at: Union[datetime, None] = None
-        self._updated_at: Union[datetime, None] = updated_at
-        self._overall_integrity: float = -1.0
+        self.id = self._generate_id() if reading_id is None else reading_id
 
         self.sensor_id = sensor_id
         self.reading_location_id = reading_location_id
         self.reading_value = reading_value
+
+        self.is_trusted_reading = trusted_reading
+        self.is_location_known = location_known
+        self.is_location_accurate = location_accurate
+        self.is_processed = is_processed
         self.overall_integrity = overall_integrity
 
+        self._read_at = read_at
         if received_at is not None:
             self.received_at = received_at
+        self._set_updated_at(updated_at)
 
-        self.id = str(uuid.uuid4()) if reading_id is None else reading_id
+    @staticmethod
+    def _generate_id() -> str:
+        return str(uuid.uuid4())
+
+    def _set_updated_at(self, dt: datetime) -> None:
+        self._updated_at = dt if dt is not None else datetime.utcnow()
 
     def _change_updated_at(self) -> None:
         self._updated_at = datetime.utcnow()
@@ -56,6 +75,22 @@ class SensorReading(persistent.Persistent):
                f"Reading Value: '{self.reading_value}' | Trusted?: {self.is_trusted_reading} | " \
                f"Location Known?: {self.is_location_known} | Location Accurate?: {self.is_location_accurate} | " \
                f"Read at: {read_at} | Updated at: {updated_at} | Received at: {received_at}"
+
+    @property
+    def id(self) -> str:
+        return self._id
+
+    @id.setter
+    def id(self, value: str) -> None:
+        label = "reading id"
+        validators.is_str_not_null_or_empty(value, label)
+        validators.is_valid_guid(value, label)
+
+        if self._id is not None and self._id != value:
+            raise ValueError(f"Reading Id is set to '{self._id}' and cannot be changed (to '{value}')")
+
+        self._id = value
+        self._change_updated_at()
 
     @property
     def sensor_id(self) -> str:
@@ -107,22 +142,6 @@ class SensorReading(persistent.Persistent):
         self._change_updated_at()
 
     @property
-    def id(self) -> str:
-        return self._id
-
-    @id.setter
-    def id(self, value: str) -> None:
-        label = "reading id"
-        validators.is_str_not_null_or_empty(value, label)
-        validators.is_valid_guid(value, label)
-
-        if self._id is not None and self._id != value:
-            raise ValueError(f"Reading Id is set to '{self._id}' and cannot be changed (to '{value}')")
-
-        self._id = value
-        self._change_updated_at()
-
-    @property
     def is_location_known(self) -> bool:
         return self._is_location_known
 
@@ -149,29 +168,6 @@ class SensorReading(persistent.Persistent):
         self._change_updated_at()
 
     @property
-    def read_at(self) -> datetime:
-        return self._read_at
-
-    @property
-    def received_at(self) -> datetime:
-        return self._received_at
-
-    @received_at.setter
-    def received_at(self, value: datetime) -> None:
-        label = "received at timestamp"
-        validators.is_not_null(value, label)
-        validators.is_of_type(value, datetime, label)
-
-        if self._received_at is not None:
-            raise ValueError("Cannot change received at datetime")
-
-        self._received_at = value
-
-    @property
-    def updated_at(self) -> datetime:
-        return self._updated_at
-
-    @property
     def is_processed(self) -> bool:
         return self._is_processed
 
@@ -196,6 +192,29 @@ class SensorReading(persistent.Persistent):
         validators.is_number_between(value, 0.0, 1.0, label)
 
         self._overall_integrity = value
+
+    @property
+    def read_at(self) -> datetime:
+        return self._read_at
+
+    @property
+    def received_at(self) -> datetime:
+        return self._received_at
+
+    @received_at.setter
+    def received_at(self, value: datetime) -> None:
+        label = "received at timestamp"
+        validators.is_not_null(value, label)
+        validators.is_of_type(value, datetime, label)
+
+        if self._received_at is not None:
+            raise ValueError("Cannot change received at datetime")
+
+        self._received_at = value
+
+    @property
+    def updated_at(self) -> datetime:
+        return self._updated_at
 
 
 if __name__ == '__main__':

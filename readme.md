@@ -36,18 +36,22 @@ You use the current scripts:
 1. `run_server.py`: starts the gRPC server
 2. `run_client.py`: sends random readings to the server and then fetches (and prints) all readings
 3. `run_api.py`: starts the flask API
-4. `run_send_api_request.py`: sends a post request to the API
+4. `run_send_api_request.py`: sends a post request to the API (good to make simple tests)
+5. `run_print_sensors_and_locations.py`: prints all sensors and locations available.
 
 ## Performance
-- *Update 16/12/2021*: I used the IDE (PyCharm) to run the gRPC server AND the API at the same time. To make the requests I used another 
-application I made using GoLang and the result was: 578 requests processed each second. It's a good first start, but I 
-believe I can do better.
+- *Update - Dec 12th, 2021*: I used the IDE (PyCharm) to run the gRPC server AND the API at the same time. To make the 
+requests I used another application I made using GoLang and the result was: 578 requests processed each second 
+(or 49.9 million requests/day). It's a good first start, but I believe I can do better.
+
+- *Update - Dec 21st, 2021*: After a bunch of refactoring in both this application and the one I use to test it, I've got 
+a better result: 1156 requests/second (or 99.8 million requests/day).
 
 ```shell
 go-Request!::POST
-Your session id is: 59028850-6238-4601-9a92-bd51a313c667
-Making POST requests 100% |████████████████████████████████████████████████████████████████| (5000/5000, 578 it/s)
-Done! Elapsed time: 8.6464703s
+Your session id is: 051a2b75-6397-4e8e-b4da-2a87145e0ee2
+Making POST requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 1156 it/s)
+Done! Elapsed time: 514.3µs
 
 Process finished with the exit code 0
 
@@ -73,3 +77,6 @@ Process finished with the exit code 0
 # Next steps
 After finishing TODO items 1 and 2, I'll probably go look for a raspberry pi zero w and a couple of sensors, so I 
 can start "Audrey II" project.
+
+# Application used to test the API:
+go-Request: https://github.com/brenordv/go-request

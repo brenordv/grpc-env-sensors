@@ -1,6 +1,6 @@
 {
   "logging": {
-    "level": "DEBUG"
+    "level": "INFO"
   },
   "api": {
     "host": "0.0.0.0",

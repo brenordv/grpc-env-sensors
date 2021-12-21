@@ -6,14 +6,14 @@ from core import validators
 
 
 class Sensor(persistent.Persistent):
+    _id: Union[str, None] = None
+    _location_id: Union[str, None] = None
+    _sensor_name: Union[str, None] = None
+
     def __init__(self,
                  sensor_id: str,
                  location_id: str,
                  sensor_name: str):
-        self._id: Union[str, None] = None
-        self._location_id: Union[str, None] = None
-        self._sensor_name: Union[str, None] = None
-
         self.id = sensor_id
         self.location_id = location_id
         self.sensor_name = sensor_name
