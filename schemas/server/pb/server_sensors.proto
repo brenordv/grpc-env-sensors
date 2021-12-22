@@ -2,6 +2,10 @@ syntax = "proto3";
 
 message no_parameter {}
 
+message request_limiter {
+  int64 limit = 1;
+}
+
 message base_operation_result {
   bool success = 1;
   string error_message = 2;
@@ -51,6 +55,6 @@ message sensor_reading_fetch_multi_item_response {
 
 service SensorService {
   rpc save_reading(new_sensor_reading_save_request) returns (new_sensor_reading_save_response) {}
-  rpc get_readings(no_parameter) returns (sensor_reading_fetch_multi_item_response) {}
+  rpc get_readings(request_limiter) returns (sensor_reading_fetch_multi_item_response) {}
   rpc get_reading(sensor_reading_fetch_single_item_request) returns (sensor_reading_fetch_single_item_response) {}
 }
