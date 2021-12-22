@@ -60,6 +60,7 @@ You use the current scripts:
 3. `run_client.py`: sends random readings to the server and then fetches (and prints) all readings
 4. `run_send_api_request.py`: sends a post request to the API (good to make simple tests)
 5. `run_print_sensors_and_locations.py`: prints all sensors and locations available.
+6. `run_playground.py`: testing area. don't need to run it for anything.
 
 ## Performance
 - *Update - Dec 12th, 2021*: I used the IDE (PyCharm) to run the gRPC server AND the API at the same time. To make the 
