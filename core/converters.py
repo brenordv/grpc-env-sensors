@@ -2,7 +2,6 @@
 from datetime import datetime
 from enum import Enum
 from typing import Union
-
 import dateutil.parser
 
 import server.pb.server_sensors_pb2 as pb2
@@ -16,7 +15,7 @@ class KnownTypes(Enum):
     FLOAT = 3
     VALUES = 4
     SENSOR_READING = 5
-    SENSOR_READING_ITEM = 6
+    SENSOR_READING_MESSAGE = 6
     NEW_SENSOR_READING_SAVE_REQUEST = 7
     BASE_OPERATION_RESULT = 8
 
@@ -45,8 +44,8 @@ class From(object):
         elif isinstance(input_value, SensorReading):
             return KnownTypes.SENSOR_READING
 
-        elif isinstance(input_value, pb2.sensor_reading_item):
-            return KnownTypes.SENSOR_READING_ITEM
+        elif isinstance(input_value, pb2.sensor_reading_message):
+            return KnownTypes.SENSOR_READING_MESSAGE
 
         elif isinstance(input_value, pb2.new_sensor_reading_save_request):
             return KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST
@@ -72,14 +71,14 @@ class From(object):
         elif self._type == KnownTypes.VALUES and new_type == KnownTypes.BASE_OPERATION_RESULT:
             return _from_values_to_proto_base_operation_result(**self._value)
 
-        elif self._type == KnownTypes.SENSOR_READING_ITEM and new_type == KnownTypes.SENSOR_READING:
-            return _from_proto_sensor_reading_fetch_single_item_response_to_sensor_reading(self._value)
+        elif self._type == KnownTypes.SENSOR_READING_MESSAGE and new_type == KnownTypes.SENSOR_READING:
+            return _from_proto_sensor_reading_message_to_sensor_reading(self._value)
 
         elif self._type == KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST and new_type == KnownTypes.SENSOR_READING:
             return _from_proto_new_sensor_reading_save_request_to_sensor_reading(self._value)
 
-        elif self._type == KnownTypes.SENSOR_READING and new_type == KnownTypes.SENSOR_READING_ITEM:
-            return _from_sensor_reading_to_proto_sensor_reading_fetch_multi_item_response(self._value)
+        elif self._type == KnownTypes.SENSOR_READING and new_type == KnownTypes.SENSOR_READING_MESSAGE:
+            return _from_sensor_reading_to_proto_sensor_reading_message(self._value)
 
         raise TypeError(f"don't know how to convert from '{self._type}' to '{new_type}'")
 
@@ -103,9 +102,9 @@ def _simple_to_string(value) -> str:
     return str(value)
 
 
-def _from_sensor_reading_to_proto_sensor_reading_fetch_multi_item_response(
-        reading: SensorReading) -> pb2.sensor_reading_item:
-    return pb2.sensor_reading_item(
+def _from_sensor_reading_to_proto_sensor_reading_message(
+        reading: SensorReading) -> pb2.sensor_reading_message:
+    return pb2.sensor_reading_message(
         id=reading.id,
         sensor_id=reading.sensor_id,
         reading_location_id=reading.reading_location_id,
@@ -131,8 +130,8 @@ def _from_proto_new_sensor_reading_save_request_to_sensor_reading(
     )
 
 
-def _from_proto_sensor_reading_fetch_single_item_response_to_sensor_reading(
-        proto: pb2.sensor_reading_item) -> SensorReading:
+def _from_proto_sensor_reading_message_to_sensor_reading(
+        proto: pb2.sensor_reading_message) -> SensorReading:
     return SensorReading(
         reading_id=proto.id,
         sensor_id=proto.sensor_id,

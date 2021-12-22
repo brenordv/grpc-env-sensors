@@ -23,7 +23,7 @@ message new_sensor_reading_save_response {
   base_operation_result result = 2;
 }
 
-message sensor_reading_item {
+message sensor_reading_message {
   string id = 1;
   string sensor_id = 2;
   string reading_location_id = 3;
@@ -43,12 +43,12 @@ message sensor_reading_fetch_single_item_request {
 }
 
 message sensor_reading_fetch_single_item_response {
-  sensor_reading_item item = 1;
+  sensor_reading_message item = 1;
   base_operation_result result = 2;
 }
 
 message sensor_reading_fetch_multi_item_response {
-  repeated sensor_reading_item items = 1;
+  repeated sensor_reading_message items = 1;
   double item_count = 2;
   base_operation_result result = 3;
 }

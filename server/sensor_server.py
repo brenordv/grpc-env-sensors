@@ -69,7 +69,7 @@ class SensorServer(pb2_grpc.SensorService):
         try:
             limit = request.limit if request.limit is not None and request.limit != 0 else None
             readings = self._storage_service.get_readings(limit=limit)
-            proto_readings = [converters.From(reading).to(KnownTypes.SENSOR_READING_ITEM) for reading in readings]
+            proto_readings = [converters.From(reading).to(KnownTypes.SENSOR_READING_MESSAGE) for reading in readings]
             read_count = f" | Found '{len(proto_readings)}' items."
 
             return pb2.sensor_reading_fetch_multi_item_response(
@@ -116,7 +116,7 @@ class SensorServer(pb2_grpc.SensorService):
                 )
 
             else:
-                result_item = converters.From(reading).to(KnownTypes.SENSOR_READING_ITEM)
+                result_item = converters.From(reading).to(KnownTypes.SENSOR_READING_MESSAGE)
                 result = pb2.sensor_reading_fetch_single_item_response(
                     item=result_item,
                     result=converters.build_success_result()
