@@ -12,17 +12,39 @@
 I’m used to working in projects where the system receives tons of data (readings) from various environment sensors and 
 then decide to act, depending on what it is receiving.
 
-Since I have never worked with gRPC and ZODB with Python, I decided to create this project.
+Since I have never worked with gRPC and ZODB, I decided to create this project.
 The idea is simple: Use gRPC and ZODB and create a base system that could digest lots of sensor data and scale out,
-if necessary.
+if necessary. The messages can be received, read and processed directly using a gRPC client or via the Flask API (which,
+in turn, use the gRPC client).
 
 Some aspects of this project (like validation and what to do with the readings received) are quite generic,
-since it’s not based on any business logic or real world case.
+since it’s not based on any business logic or real world case. I plan on setting up a couple of sensors with an 
+Arduino (or a Raspberry Pi) and make it send the readings to the API.
+
+# Why Python, Flask and gRPC?
+## Python
+My programming language of choice. Easy to learn, fast to code and help is just a DuckDuckGo (or Google) search away.
+
+## Flask
+In my opinion, Flask is way more flexible, easy to learn and lightweight than Django. Taking that in consideration, 
+along with the scope of this project, it makes more sense to choose Flask over Django.
+
+## gRPC
+I've heard some great things about gRPC, but never tried it. As far as I researched it's a great option for a low 
+latency, high scalability (language agnostic) solution. It adds a couple layers of complexity to the application (when
+we compare to not using any type of RPC at all), but I'm believing it is worth it, specially considering load balancing 
+and application evolution.
+
+## ZODB
+Until this project I had never even heard of Zope Foundation or ZODB, but it turned out to be an excellent option.
+It's simple and fast, great for concurrent access. I know it was not designed for this type of use, but would work.
+In a real life scenario I could probably use ZODB as a buffer for a slower, but more scalable solution.
 
 
 # Entities
 In its current state, this project has 3 entities:
-1. **Location**: Not all that useful. Not used for anything, really. Included because it makes sense, even in a basic setting for this type of thing.
+1. **Location**: Not all that useful. Not used for anything, really. Included because it makes sense, even in a basic 
+setting for this type of thing.
 2. **Sensor**: Represents the physical sensor that's (hypothetically) sending environment readings.
 3. **Sensor Reading**: The actual reading from the sensor. Contains a lot of data.
 
@@ -33,9 +55,9 @@ Also, all entities have read-only properties and validation on setters, to make 
 
 # How to make it all work
 You use the current scripts:
-1. `run_server.py`: starts the gRPC server
-2. `run_client.py`: sends random readings to the server and then fetches (and prints) all readings
-3. `run_api.py`: starts the flask API
+1. `run_server.py`: starts the gRPC server. You should run this first.
+2. `run_api.py`: starts the flask API. You should run this after `run_server.py`, so it can connect to the server.
+3. `run_client.py`: sends random readings to the server and then fetches (and prints) all readings
 4. `run_send_api_request.py`: sends a post request to the API (good to make simple tests)
 5. `run_print_sensors_and_locations.py`: prints all sensors and locations available.
 
@@ -44,8 +66,8 @@ You use the current scripts:
 requests I used another application I made using GoLang and the result was: 578 requests processed each second 
 (or 49.9 million requests/day). It's a good first start, but I believe I can do better.
 
-- *Update - Dec 21st, 2021*: After a bunch of refactoring in both this application and the one I use to test it, I've got 
-a better result: 1156 requests/second (or 99.8 million requests/day).
+- *Update - Dec 21st, 2021*: After a bunch of refactoring in both this application and the one I use to test it, I've 
+got a better result: 1156 requests/second (or 99.8 million requests/day).
 
 ```shell
 go-Request!::POST
