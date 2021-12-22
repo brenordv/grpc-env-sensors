@@ -52,35 +52,75 @@ class From(object):
 
         raise TypeError(f"type '{type(input_value).__name__}' is unknown")
 
-    def to(self, new_type: KnownTypes):
-        if self._type == KnownTypes.STRING and new_type == KnownTypes.INT:
+    def _from_string(self, new_type: KnownTypes):
+        if new_type == KnownTypes.INT:
             return _from_string_to_int(self._value)
 
-        elif self._type == KnownTypes.STRING and new_type == KnownTypes.FLOAT:
+        elif new_type == KnownTypes.FLOAT:
             return _from_string_to_float(self._value)
 
-        elif self._type in self._simple_to_string_types and new_type == KnownTypes.STRING:
+        return None
+
+    def _from_simple_to_str(self, new_type: KnownTypes):
+        if new_type == KnownTypes.STRING:
             return _simple_to_string(self._value)
 
-        elif self._type == KnownTypes.VALUES and new_type == KnownTypes.SENSOR_READING:
+        return None
+
+    def _from_values(self, new_type: KnownTypes):
+        if new_type == KnownTypes.SENSOR_READING:
             return _from_values_to_sensor_reading(**self._value)
 
-        elif self._type == KnownTypes.VALUES and new_type == KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST:
+        elif new_type == KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST:
             return _from_values_to_proto_new_sensor_reading_save_request(**self._value)
 
-        elif self._type == KnownTypes.VALUES and new_type == KnownTypes.BASE_OPERATION_RESULT:
+        elif new_type == KnownTypes.BASE_OPERATION_RESULT:
             return _from_values_to_proto_base_operation_result(**self._value)
 
-        elif self._type == KnownTypes.SENSOR_READING_MESSAGE and new_type == KnownTypes.SENSOR_READING:
+        return None
+
+    def _from_sensor_reading_message(self, new_type: KnownTypes):
+        if new_type == KnownTypes.SENSOR_READING:
             return _from_proto_sensor_reading_message_to_sensor_reading(self._value)
 
-        elif self._type == KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST and new_type == KnownTypes.SENSOR_READING:
+        return None
+
+    def _from_new_sensor_reading_request(self, new_type: KnownTypes):
+        if new_type == KnownTypes.SENSOR_READING:
             return _from_proto_new_sensor_reading_save_request_to_sensor_reading(self._value)
 
-        elif self._type == KnownTypes.SENSOR_READING and new_type == KnownTypes.SENSOR_READING_MESSAGE:
+        return None
+
+    def _from_sensor_reading(self, new_type: KnownTypes):
+        if new_type == KnownTypes.SENSOR_READING_MESSAGE:
             return _from_sensor_reading_to_proto_sensor_reading_message(self._value)
 
-        raise TypeError(f"don't know how to convert from '{self._type}' to '{new_type}'")
+        return None
+
+    def to(self, new_type: KnownTypes):
+        converted = None
+        if self._type == KnownTypes.STRING:
+            converted = self._from_string(new_type)
+
+        elif self._type == KnownTypes.VALUES:
+            converted = self._from_values(new_type)
+
+        elif self._type == KnownTypes.SENSOR_READING_MESSAGE:
+            converted = self._from_sensor_reading_message(new_type)
+
+        elif self._type == KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST:
+            converted = self._from_new_sensor_reading_request(new_type)
+
+        elif self._type == KnownTypes.SENSOR_READING:
+            converted = self._from_sensor_reading(new_type)
+
+        elif self._type in self._simple_to_string_types:
+            converted = self._from_simple_to_str(new_type)
+
+        if converted is None:
+            raise TypeError(f"don't know how to convert from '{self._type}' to '{new_type}'")
+
+        return converted
 
 
 def build_success_result():

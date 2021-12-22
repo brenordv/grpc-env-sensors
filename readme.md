@@ -68,7 +68,8 @@ requests I used another application I made using GoLang and the result was: 578 
 (or 49.9 million requests/day). It's a good first start, but I believe I can do better.
 
 - *Update - Dec 21st, 2021*: After a bunch of refactoring in both this application and the one I use to test it, I've 
-got a better result: 1156 requests/second (or 99.8 million requests/day).
+got a better result: 1156 requests/second (or 99.8 million requests/day). I'm reasonably happy with the performance on 
+post (write) route, but performance on the get (read) route are way off of what I want it to be.
 
 ### Test output for sending 5000 readings
 ```text
@@ -83,11 +84,10 @@ Process finished with the exit code 0
 ### Test output for sending 5000 request to get latest 1000 readings
 ```text
 go-Request!::GET
-Your session id is: 27b122df-137e-4c15-86f9-04cef98eabe0
-Making GET requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 286 it/s)
+Your session id is: 95c7f4f2-b920-4717-9120-482ad24fdc49
+Making GET requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 176 it/s)
 Done! Elapsed time: 0s
 
-Process finished with the exit code 0
 ```
 
 ### Test output for sending 5000 request to get latest 100 readings
@@ -100,6 +100,16 @@ Done! Elapsed time: 0s
 Process finished with the exit code 0
 ```
 
+### Test output for sending 5000 request to get the latest reading
+```text
+go-Request!::GET
+Your session id is: 5a8b4a86-6290-4594-8847-82479f01bf60
+Making GET requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 128 it/s)
+Done! Elapsed time: 527.9µs
+
+
+Process finished with the exit code 0
+```
 
 # Big picture
 - Clients, services, private apis and other clients can access teh gRPC endpoints.
