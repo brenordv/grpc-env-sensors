@@ -70,10 +70,14 @@ class StorageService(object):
         fetched_reading = self._root[self._sensor_readings_key].get(reading_id)
         return fetched_reading
 
-    def get_readings(self) -> Generator[SensorReading, None, None]:
+    def get_readings(self, limit: Union[int, None]) -> Generator[SensorReading, None, None]:
         """Returns all registered sensor readings."""
-        for reading_id, reading in self._root[self._sensor_readings_key].items():
-            yield reading
+        keys = list(self._root[self._sensor_readings_key].keys())
+        if limit is not None and limit != 0:
+            keys = keys[limit:] if limit < 0 else keys[:limit]
+
+        for reading_id in keys:
+            yield self._root[self._sensor_readings_key][reading_id]
 
     def upsert_location(self, location: Location) -> None:
         """Inserts or update a location."""

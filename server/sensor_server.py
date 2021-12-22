@@ -59,7 +59,7 @@ class SensorServer(pb2_grpc.SensorService):
             logging.info(f"[SERVER] Save reading done. Elapsed time: {timer.end()}{persisted_msg}{error_msg}")
 
     def get_readings(self,
-                     request: pb2.no_parameter, target, options=(),
+                     request: pb2.request_limiter, target, options=(),
                      channel_credentials=None, call_credentials=None, insecure=False, compression=None,
                      wait_for_ready=None, timeout=None, metadata=None) -> pb2.sensor_reading_fetch_multi_item_response:
         timer = StopWatch(True)
@@ -67,7 +67,8 @@ class SensorServer(pb2_grpc.SensorService):
         read_count = ''
 
         try:
-            readings = self._storage_service.get_readings()
+            limit = request.limit if request.limit is not None and request.limit != 0 else None
+            readings = self._storage_service.get_readings(limit=limit)
             proto_readings = [converters.From(reading).to(KnownTypes.SENSOR_READING_ITEM) for reading in readings]
             read_count = f" | Found '{len(proto_readings)}' items."
 

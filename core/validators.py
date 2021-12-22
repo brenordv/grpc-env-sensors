@@ -20,11 +20,36 @@ def is_str_not_null_or_empty(value: str, label: str) -> None:
     raise ValueError(f"{label} cannot be null or empty text")
 
 
+def is_number(value: Union[str, int, float, None], label: str) -> None:
+    if isinstance(value, (int, float)):
+        return
+
+    is_str_not_null_or_empty(value, label)
+    try:
+        int(value)
+        return
+    except ValueError:
+        pass
+
+    try:
+        float(value)
+        return
+    except ValueError:
+        pass
+
+    raise ValueError(f"{label} with value '{value}' is not a number")
+
+
 def is_of_type(value, value_type: Union[Type[any], Tuple[Type[any]]], label: str) -> None:
     if isinstance(value, value_type):
         return
 
-    raise TypeError(f"{label} must be a '{value_type.__name__}'. got '{type(value).__name__}'")
+    if isinstance(value_type, (tuple, list)):
+        expected_types = ', '.join(value_type)
+        raise TypeError(f"{label} must be one of the following types '{expected_types}'. got '{type(value).__name__}'")
+
+    expected_types = value_type.__name__
+    raise TypeError(f"{label} must be of type '{expected_types}'. got '{type(value).__name__}'")
 
 
 def is_valid_guid(guid: str, label: str) -> None:

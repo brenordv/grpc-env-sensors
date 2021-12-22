@@ -69,15 +69,36 @@ requests I used another application I made using GoLang and the result was: 578 
 - *Update - Dec 21st, 2021*: After a bunch of refactoring in both this application and the one I use to test it, I've 
 got a better result: 1156 requests/second (or 99.8 million requests/day).
 
-```shell
+### Test output for sending 5000 readings
+```text
 go-Request!::POST
 Your session id is: 051a2b75-6397-4e8e-b4da-2a87145e0ee2
 Making POST requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 1156 it/s)
 Done! Elapsed time: 514.3µs
 
 Process finished with the exit code 0
-
 ```
+
+### Test output for sending 5000 request to get latest 1000 readings
+```text
+go-Request!::GET
+Your session id is: 27b122df-137e-4c15-86f9-04cef98eabe0
+Making GET requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 286 it/s)
+Done! Elapsed time: 0s
+
+Process finished with the exit code 0
+```
+
+### Test output for sending 5000 request to get latest 100 readings
+```text
+go-Request!::GET
+Your session id is: 27b122df-137e-4c15-86f9-04cef98eabe0
+Making GET requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 286 it/s)
+Done! Elapsed time: 0s
+
+Process finished with the exit code 0
+```
+
 
 # Big picture
 - Clients, services, private apis and other clients can access teh gRPC endpoints.

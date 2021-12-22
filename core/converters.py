@@ -11,21 +11,35 @@ from core.utils import iso8601_str_to_datetime
 
 
 class KnownTypes(Enum):
-    VALUES = 1
-    SENSOR_READING = 2
-    SENSOR_READING_ITEM = 3
-    NEW_SENSOR_READING_SAVE_REQUEST = 4
-    BASE_OPERATION_RESULT = 5
+    STRING = 1
+    INT = 2
+    FLOAT = 3
+    VALUES = 4
+    SENSOR_READING = 5
+    SENSOR_READING_ITEM = 6
+    NEW_SENSOR_READING_SAVE_REQUEST = 7
+    BASE_OPERATION_RESULT = 8
 
 
 class From(object):
+    _simple_to_string_types = [KnownTypes.STRING, KnownTypes.INT, KnownTypes.FLOAT, KnownTypes.VALUES]
+
     def __init__(self, input_value):
         self._type = self._get_conversion_type(input_value)
         self._value = input_value
 
     @staticmethod
     def _get_conversion_type(input_value) -> KnownTypes:
-        if isinstance(input_value, dict):
+        if isinstance(input_value, str):
+            return KnownTypes.STRING
+
+        elif isinstance(input_value, int):
+            return KnownTypes.INT
+
+        elif isinstance(input_value, float):
+            return KnownTypes.FLOAT
+
+        elif isinstance(input_value, dict):
             return KnownTypes.VALUES
 
         elif isinstance(input_value, SensorReading):
@@ -40,7 +54,16 @@ class From(object):
         raise TypeError(f"type '{type(input_value).__name__}' is unknown")
 
     def to(self, new_type: KnownTypes):
-        if self._type == KnownTypes.VALUES and new_type == KnownTypes.SENSOR_READING:
+        if self._type == KnownTypes.STRING and new_type == KnownTypes.INT:
+            return _from_string_to_int(self._value)
+
+        elif self._type == KnownTypes.STRING and new_type == KnownTypes.FLOAT:
+            return _from_string_to_float(self._value)
+
+        elif self._type in self._simple_to_string_types and new_type == KnownTypes.STRING:
+            return _simple_to_string(self._value)
+
+        elif self._type == KnownTypes.VALUES and new_type == KnownTypes.SENSOR_READING:
             return _from_values_to_sensor_reading(**self._value)
 
         elif self._type == KnownTypes.VALUES and new_type == KnownTypes.NEW_SENSOR_READING_SAVE_REQUEST:
@@ -66,6 +89,18 @@ def build_success_result():
         "success": True,
         "error_message": None
     }).to(KnownTypes.BASE_OPERATION_RESULT)
+
+
+def _from_string_to_int(value: str) -> int:
+    return int(value)
+
+
+def _from_string_to_float(value: str) -> float:
+    return float(value)
+
+
+def _simple_to_string(value) -> str:
+    return str(value)
 
 
 def _from_sensor_reading_to_proto_sensor_reading_fetch_multi_item_response(

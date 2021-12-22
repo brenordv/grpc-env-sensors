@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from typing import Union
+
 import grpc
 import logging
 from datetime import datetime
@@ -48,10 +50,10 @@ class SensorClient(object):
         logging.info(f"[CLIENT] Saving reading done. Elapsed time: {timer.end()}")
         return result
 
-    def get_readings(self) -> dict:
+    def get_readings(self, limit: Union[int, None] = None) -> dict:
         logging.info("[CLIENT] Sending request to get all readings!")
         timer = StopWatch(True)
-        response = self.__stub__.get_readings(pb2.no_parameter())
+        response = self.__stub__.get_readings(pb2.request_limiter(limit=limit))
 
         if response.result.success:
             logging.info("[CLIENT] Success getting all readings.")

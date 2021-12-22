@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x1eserver/pb/server_sensors.proto\"\x0e\n\x0cno_parameter\"?\n\x15\x62\x61se_operation_result\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x15\n\rerror_message\x18\x02 \x01(\t\"y\n\x1fnew_sensor_reading_save_request\x12\x11\n\tsensor_id\x18\x01 \x01(\t\x12\x1b\n\x13reading_location_id\x18\x02 \x01(\t\x12\x15\n\rreading_value\x18\x03 \x01(\x02\x12\x0f\n\x07read_at\x18\x04 \x01(\t\"^\n new_sensor_reading_save_response\x12\x12\n\nreading_id\x18\x01 \x01(\t\x12&\n\x06result\x18\x02 \x01(\x0b\x32\x16.base_operation_result\"\x9f\x02\n\x13sensor_reading_item\x12\n\n\x02id\x18\x01 \x01(\t\x12\x11\n\tsensor_id\x18\x02 \x01(\t\x12\x1b\n\x13reading_location_id\x18\x03 \x01(\t\x12\x15\n\rreading_value\x18\x04 \x01(\x02\x12\x17\n\x0ftrusted_reading\x18\x05 \x01(\x08\x12\x16\n\x0elocation_known\x18\x06 \x01(\x08\x12\x19\n\x11location_accurate\x18\x07 \x01(\x08\x12\x14\n\x0cis_processed\x18\x08 \x01(\x08\x12\x0f\n\x07read_at\x18\t \x01(\t\x12\x12\n\nupdated_at\x18\n \x01(\t\x12\x13\n\x0breceived_at\x18\x0b \x01(\t\x12\x19\n\x11overall_integrity\x18\x0c \x01(\x02\">\n(sensor_reading_fetch_single_item_request\x12\x12\n\nreading_id\x18\x01 \x01(\t\"w\n)sensor_reading_fetch_single_item_response\x12\"\n\x04item\x18\x01 \x01(\x0b\x32\x14.sensor_reading_item\x12&\n\x06result\x18\x02 \x01(\x0b\x32\x16.base_operation_result\"\x8b\x01\n(sensor_reading_fetch_multi_item_response\x12#\n\x05items\x18\x01 \x03(\x0b\x32\x14.sensor_reading_item\x12\x12\n\nitem_count\x18\x02 \x01(\x01\x12&\n\x06result\x18\x03 \x01(\x0b\x32\x16.base_operation_result2\x9a\x02\n\rSensorService\x12U\n\x0csave_reading\x12 .new_sensor_reading_save_request\x1a!.new_sensor_reading_save_response\"\x00\x12J\n\x0cget_readings\x12\r.no_parameter\x1a).sensor_reading_fetch_multi_item_response\"\x00\x12\x66\n\x0bget_reading\x12).sensor_reading_fetch_single_item_request\x1a*.sensor_reading_fetch_single_item_response\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x1eserver/pb/server_sensors.proto\"\x0e\n\x0cno_parameter\" \n\x0frequest_limiter\x12\r\n\x05limit\x18\x01 \x01(\x03\"?\n\x15\x62\x61se_operation_result\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x15\n\rerror_message\x18\x02 \x01(\t\"y\n\x1fnew_sensor_reading_save_request\x12\x11\n\tsensor_id\x18\x01 \x01(\t\x12\x1b\n\x13reading_location_id\x18\x02 \x01(\t\x12\x15\n\rreading_value\x18\x03 \x01(\x02\x12\x0f\n\x07read_at\x18\x04 \x01(\t\"^\n new_sensor_reading_save_response\x12\x12\n\nreading_id\x18\x01 \x01(\t\x12&\n\x06result\x18\x02 \x01(\x0b\x32\x16.base_operation_result\"\x9f\x02\n\x13sensor_reading_item\x12\n\n\x02id\x18\x01 \x01(\t\x12\x11\n\tsensor_id\x18\x02 \x01(\t\x12\x1b\n\x13reading_location_id\x18\x03 \x01(\t\x12\x15\n\rreading_value\x18\x04 \x01(\x02\x12\x17\n\x0ftrusted_reading\x18\x05 \x01(\x08\x12\x16\n\x0elocation_known\x18\x06 \x01(\x08\x12\x19\n\x11location_accurate\x18\x07 \x01(\x08\x12\x14\n\x0cis_processed\x18\x08 \x01(\x08\x12\x0f\n\x07read_at\x18\t \x01(\t\x12\x12\n\nupdated_at\x18\n \x01(\t\x12\x13\n\x0breceived_at\x18\x0b \x01(\t\x12\x19\n\x11overall_integrity\x18\x0c \x01(\x02\">\n(sensor_reading_fetch_single_item_request\x12\x12\n\nreading_id\x18\x01 \x01(\t\"w\n)sensor_reading_fetch_single_item_response\x12\"\n\x04item\x18\x01 \x01(\x0b\x32\x14.sensor_reading_item\x12&\n\x06result\x18\x02 \x01(\x0b\x32\x16.base_operation_result\"\x8b\x01\n(sensor_reading_fetch_multi_item_response\x12#\n\x05items\x18\x01 \x03(\x0b\x32\x14.sensor_reading_item\x12\x12\n\nitem_count\x18\x02 \x01(\x01\x12&\n\x06result\x18\x03 \x01(\x0b\x32\x16.base_operation_result2\x9d\x02\n\rSensorService\x12U\n\x0csave_reading\x12 .new_sensor_reading_save_request\x1a!.new_sensor_reading_save_response\"\x00\x12M\n\x0cget_readings\x12\x10.request_limiter\x1a).sensor_reading_fetch_multi_item_response\"\x00\x12\x66\n\x0bget_reading\x12).sensor_reading_fetch_single_item_request\x1a*.sensor_reading_fetch_single_item_response\"\x00\x62\x06proto3'
 )
 
 
@@ -47,6 +47,38 @@ _NO_PARAMETER = _descriptor.Descriptor(
   ],
   serialized_start=34,
   serialized_end=48,
+)
+
+
+_REQUEST_LIMITER = _descriptor.Descriptor(
+  name='request_limiter',
+  full_name='request_limiter',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='limit', full_name='request_limiter.limit', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=50,
+  serialized_end=82,
 )
 
 
@@ -84,8 +116,8 @@ _BASE_OPERATION_RESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=50,
-  serialized_end=113,
+  serialized_start=84,
+  serialized_end=147,
 )
 
 
@@ -137,8 +169,8 @@ _NEW_SENSOR_READING_SAVE_REQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=115,
-  serialized_end=236,
+  serialized_start=149,
+  serialized_end=270,
 )
 
 
@@ -176,8 +208,8 @@ _NEW_SENSOR_READING_SAVE_RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=238,
-  serialized_end=332,
+  serialized_start=272,
+  serialized_end=366,
 )
 
 
@@ -285,8 +317,8 @@ _SENSOR_READING_ITEM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=335,
-  serialized_end=622,
+  serialized_start=369,
+  serialized_end=656,
 )
 
 
@@ -317,8 +349,8 @@ _SENSOR_READING_FETCH_SINGLE_ITEM_REQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=624,
-  serialized_end=686,
+  serialized_start=658,
+  serialized_end=720,
 )
 
 
@@ -356,8 +388,8 @@ _SENSOR_READING_FETCH_SINGLE_ITEM_RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=688,
-  serialized_end=807,
+  serialized_start=722,
+  serialized_end=841,
 )
 
 
@@ -402,8 +434,8 @@ _SENSOR_READING_FETCH_MULTI_ITEM_RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=810,
-  serialized_end=949,
+  serialized_start=844,
+  serialized_end=983,
 )
 
 _NEW_SENSOR_READING_SAVE_RESPONSE.fields_by_name['result'].message_type = _BASE_OPERATION_RESULT
@@ -412,6 +444,7 @@ _SENSOR_READING_FETCH_SINGLE_ITEM_RESPONSE.fields_by_name['result'].message_type
 _SENSOR_READING_FETCH_MULTI_ITEM_RESPONSE.fields_by_name['items'].message_type = _SENSOR_READING_ITEM
 _SENSOR_READING_FETCH_MULTI_ITEM_RESPONSE.fields_by_name['result'].message_type = _BASE_OPERATION_RESULT
 DESCRIPTOR.message_types_by_name['no_parameter'] = _NO_PARAMETER
+DESCRIPTOR.message_types_by_name['request_limiter'] = _REQUEST_LIMITER
 DESCRIPTOR.message_types_by_name['base_operation_result'] = _BASE_OPERATION_RESULT
 DESCRIPTOR.message_types_by_name['new_sensor_reading_save_request'] = _NEW_SENSOR_READING_SAVE_REQUEST
 DESCRIPTOR.message_types_by_name['new_sensor_reading_save_response'] = _NEW_SENSOR_READING_SAVE_RESPONSE
@@ -427,6 +460,13 @@ no_parameter = _reflection.GeneratedProtocolMessageType('no_parameter', (_messag
   # @@protoc_insertion_point(class_scope:no_parameter)
   })
 _sym_db.RegisterMessage(no_parameter)
+
+request_limiter = _reflection.GeneratedProtocolMessageType('request_limiter', (_message.Message,), {
+  'DESCRIPTOR' : _REQUEST_LIMITER,
+  '__module__' : 'server.pb.server_sensors_pb2'
+  # @@protoc_insertion_point(class_scope:request_limiter)
+  })
+_sym_db.RegisterMessage(request_limiter)
 
 base_operation_result = _reflection.GeneratedProtocolMessageType('base_operation_result', (_message.Message,), {
   'DESCRIPTOR' : _BASE_OPERATION_RESULT,
@@ -486,8 +526,8 @@ _SENSORSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=952,
-  serialized_end=1234,
+  serialized_start=986,
+  serialized_end=1271,
   methods=[
   _descriptor.MethodDescriptor(
     name='save_reading',
@@ -504,7 +544,7 @@ _SENSORSERVICE = _descriptor.ServiceDescriptor(
     full_name='SensorService.get_readings',
     index=1,
     containing_service=None,
-    input_type=_NO_PARAMETER,
+    input_type=_REQUEST_LIMITER,
     output_type=_SENSOR_READING_FETCH_MULTI_ITEM_RESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
