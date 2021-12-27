@@ -136,15 +136,14 @@ You use the current scripts:
 # TODO
 0. Lots of refactoring...
 1. Create flask interface (in progress)
-2. Add post route for adding sensor_reading
-3. Standardize fetch base result to include item count and is_empty property
-4. Add swagger to flask interface
-5. Convert single use scripts to a commandline interface
-6. Add unit tests
-7. Add stress tests
+2. Standardize fetch base result to include item count and is_empty property
+3. Add swagger to flask interface
+4. Convert single use scripts to a commandline interface
+5. Add unit tests
+6. Add stress tests
 
 
 
 # Next steps
-After finishing TODO items 1 and 2, I'll probably go look for a raspberry pi zero w and a couple of sensors, so I 
+After finishing TODO items 1, 2 and 3, I'll probably go look for a raspberry pi zero w and a couple of sensors, so I 
 can start "Audrey II" project.
