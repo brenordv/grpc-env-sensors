@@ -1,4 +1,5 @@
 # Environment Sensor Data Processor
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=brenordv_grpc-env-sensors&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=brenordv_grpc-env-sensors)
