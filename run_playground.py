@@ -18,5 +18,12 @@ def get_readings_without_id():
         print(f"Found {invalid_count} invalid readings...")
 
 
+def count_readings():
+    st = StorageService()
+    count = st._readings.count_documents({})
+    print(f"There are {count} documents in readings collection...")
+
+
 if __name__ == '__main__':
-    get_readings_without_id()
+    # get_readings_without_id()
+    count_readings()

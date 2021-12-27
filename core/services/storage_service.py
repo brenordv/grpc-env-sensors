@@ -1,38 +1,35 @@
 # -*- coding: utf-8 -*-
-import logging
-from pathlib import Path
 from typing import Union, Generator
-import ZODB
-import ZODB.FileStorage
-import transaction
-from persistent.mapping import PersistentMapping
+import pymongo
+from pymongo.collection import Collection
+from pymongo.database import Database
 
+from core.entities import location as location_utils
+from core.entities import sensor as sensor_utils
+from core.entities import sensor_reading as sensor_reading_utils
 from core.entities.location import Location
 from core.entities.sensor import Sensor
 from core.entities.sensor_reading import SensorReading
-from core.settings import DB_FILE
+from core.settings import SECRETS
 
 
 class StorageService(object):
+    _id_key = "_id"
+
     """
     StorageService has all the methods to handle persistence of all entities of this application.
     Yes, it's a bloated, unsustainable approach (in the long run), but works just fine for this demo.
     """
-    def __init__(self, db_file: Union[str, Path] = DB_FILE):
-        storage = ZODB.FileStorage.FileStorage(str(db_file))
-        self._db = ZODB.DB(storage)
-        self._connection = self._db.open()
-        self._root = self._connection.root()
 
-        self._locations_key = "locations"
-        self._sensor_readings_key = "sensor_readings"
-        self._sensors_key = "sensors"
+    def __init__(self):
+        # Just a reminder: Don't do this type of thing. Use a KeyVault of some sort...
+        conn_string = SECRETS["connection_strings"]["mongodb_primary"]
+        client = pymongo.MongoClient(conn_string)
 
-        for db_name in [self._locations_key, self._sensor_readings_key, self._sensors_key]:
-            if db_name in self._root:
-                continue
-            logging.info(f"Creating collection: {db_name}")
-            self._root[db_name] = PersistentMapping()
+        self._db: Database = client["envDatabase"]
+        self._sensors: Collection = self._db["sensors"]
+        self._locations: Collection = self._db["locations"]
+        self._readings: Collection = self._db["readings"]
 
     def __enter__(self):
         return self
@@ -41,59 +38,79 @@ class StorageService(object):
         self.close()
 
     def close(self):
-        transaction.commit()
-        self._db.close()
-        self._connection.close()
+        pass
+
+    @staticmethod
+    def _get_one(col: Collection, find_op: dict):
+        found = col.find_one(find_op)
+        return found
+
+    def _get_all(self, col: Collection, limit: Union[int, None] = 0):
+        if limit is None:
+            limit = 0
+
+        if limit < 0:
+            sort = [(self._id_key, pymongo.DESCENDING), ]
+            limit *= -1
+        else:
+            sort = None
+
+        for doc in col.find(filter=None, sort=sort, limit=limit):
+            yield doc
+
+    @staticmethod
+    def _upsert(col: Collection, find_op: dict, doc):
+        col.replace_one(find_op, doc.__dict__, upsert=True)
 
     def get_location(self, location_id: str) -> Union[Location, None]:
         """Returns a single location (or null if it doesn't exist)."""
-        fetched_location = self._root[self._locations_key].get(location_id)
-        return fetched_location
+        found = self._get_one(self._locations, {self._id_key: location_id})
+        if found is None:
+            return None
+        return location_utils.materialize(found)
 
     def get_locations(self) -> Generator[Location, None, None]:
         """Returns all registered locations."""
-        for _, location in self._root[self._locations_key].items():
-            yield location
+        for loc in self._get_all(self._locations):
+            yield location_utils.materialize(loc)
 
     def get_sensor(self, sensor_id: str) -> Union[Sensor, None]:
         """Returns a single sensor (or null if it doesn't exist)."""
-        fetched_sensor = self._root[self._sensors_key].get(sensor_id)
-        return fetched_sensor
+        found = self._get_one(self._sensors, {self._id_key: sensor_id})
+        if found is None:
+            return None
+        return sensor_utils.materialize(found)
 
     def get_sensors(self) -> Generator[Sensor, None, None]:
         """Returns all registered sensors."""
-        for _, sensor in self._root[self._sensors_key].items():
-            yield sensor
+        for sen in self._get_all(self._sensors):
+            yield sensor_utils.materialize(sen)
 
     def get_reading(self, reading_id: str) -> Union[SensorReading, None]:
         """Returns a single sensor reading (or null if it doesn't exist)."""
-        fetched_reading = self._root[self._sensor_readings_key].get(reading_id)
-        return fetched_reading
+        found = self._get_one(self._readings, {self._id_key: reading_id})
+        if found is None:
+            return None
+        return sensor_reading_utils.materialize(found)
 
     def get_readings(self, limit: Union[int, None]) -> Generator[SensorReading, None, None]:
         """Returns all registered sensor readings."""
-        keys = list(self._root[self._sensor_readings_key].keys())
-        if limit is not None and limit != 0:
-            keys = keys[limit:] if limit < 0 else keys[:limit]
-
-        for reading_id in keys:
-            yield self._root[self._sensor_readings_key][reading_id]
+        for sen in self._get_all(self._readings, limit=limit):
+            yield sensor_reading_utils.materialize(sen)
 
     def upsert_location(self, location: Location) -> None:
         """Inserts or update a location."""
         if location is None:
             raise ValueError(f"Cannot add or update a null location")
 
-        self._root[self._locations_key][location.id] = location
-        transaction.commit()
+        self._upsert(self._locations, {self._id_key: location.id}, location)
 
     def upsert_sensor(self, sensor: Sensor) -> None:
         """Inserts or update a sensor."""
         if sensor is None:
             raise ValueError(f"Cannot add or update a null sensor")
 
-        self._root[self._sensors_key][sensor.id] = sensor
-        transaction.commit()
+        self._upsert(self._sensors, {self._id_key: sensor.id}, sensor)
 
     def upsert_reading(self, reading: SensorReading) -> None:
         """Inserts or update a sensor reading."""
@@ -101,9 +118,7 @@ class StorageService(object):
             raise ValueError(f"Cannot add or update a null reading")
 
         validated_reading = self.check_reading_integrity(reading)
-
-        self._root[self._sensor_readings_key][validated_reading.id] = validated_reading
-        transaction.commit()
+        self._upsert(self._readings, {self._id_key: validated_reading.id}, validated_reading)
 
     def check_reading_integrity(self, reading: SensorReading) -> SensorReading:
         """Makes a bunch of validations on the reading, to check its validity.

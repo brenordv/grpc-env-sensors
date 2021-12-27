@@ -12,16 +12,18 @@
 I’m used to working in projects where the system receives tons of data (readings) from various environment sensors and 
 then decide to act, depending on what it is receiving.
 
-Since I have never worked with gRPC and ZODB, I decided to create this project.
-The idea is simple: Use gRPC and ZODB and create a base system that could digest lots of sensor data and scale out,
-if necessary. The messages can be received, read and processed directly using a gRPC client or via the Flask API (which,
-in turn, use the gRPC client).
+Since I have never worked with gRPC, I decided to create this project.
+The idea is simple: Use gRPC and create a basic system that could digest lots of environment sensor data at once 
+(and scale out if necessary). The messages can be received, read and processed directly using a gRPC client or via the 
+Flask API (which, in turn, use the gRPC client).
 
 Some aspects of this project (like validation and what to do with the readings received) are quite generic,
-since it’s not based on any business logic or real world case. I plan on setting up a couple of sensors with an 
+since the system is not grounded in any real world case. I plan on setting up a couple of sensors with an 
 Arduino (or a Raspberry Pi) and make it send the readings to the API.
 
-# Why Python, Flask and gRPC?
+
+
+# Why Python, Flask, gRPC and MongoDb?
 ## Python
 My programming language of choice. Easy to learn, fast to code and help is just a DuckDuckGo (or Google) search away.
 
@@ -35,10 +37,17 @@ latency, high scalability (language agnostic) solution. It adds a couple layers 
 we compare to not using any type of RPC at all), but I'm believing it is worth it, specially considering load balancing 
 and application evolution.
 
-## ZODB
-Until this project I had never even heard of Zope Foundation or ZODB, but it turned out to be an excellent option.
-It's simple and fast, great for concurrent access. I know it was not designed for this type of use, but would work.
-In a real life scenario I could probably use ZODB as a buffer for a slower, but more scalable solution.
+## MongoDb
+Initially, I chose ZODB, so I could use an embedded, fast database. However, I started to notice some erratic behaviours
+when doing bigger benchmark tests. 
+So I decided to give up on the `embedded` requirement from storage and went on to MongoDb, which is also fast, easy to 
+implement and scalable.
+
+
+# Big picture
+- Clients, services, private apis and other clients can access teh gRPC endpoints.
+- Meanwhile, a public API can be used (by a frontend or other third party applications), to make use of gRPC`s endpoint.  
+![Simplified big picture of this project](schema_envisdp_v1simple.png)
 
 
 # Entities
@@ -49,11 +58,69 @@ setting for this type of thing.
 3. **Sensor Reading**: The actual reading from the sensor. Contains a lot of data.
 
 The current version of `Sensor Reading` contains both the id of its sensor and the id of its location. Normally, the 
-reading would not have both, but I decided to include it so I could make a few more validations on each reading.
+reading would not have both, but I decided to include it, so I could make a few more validations on each reading.
 
 Also, all entities have read-only properties and validation on setters, to make sure everything is has it should be.
 
-# How to make it all work
+
+
+# Performance
+## Write test - Requests to the API
+Since this would really depend on the implementation of the API and since running Flask locally is not the best way to 
+test simultaneous/parallel requests, I'll just focus the tests on direct calls to the server.
+
+## Write test - Direct calls to gRPC server
+| Workers  | Requests per Client | Total Requests | Elapsed Time    | Cap: Req/Seconds | Cap: Req/Day |
+|----------|---------------------|----------------|-----------------|------------------|--------------|
+| 1        | 10                  | 10             | 0:00:00.636513  | 15               | 1.296.000    |
+| 10       | 10                  | 100            | 0:00:00.794216  | 125              | 10.800.000   |
+| 10       | 100                 | 1000           | 0:00:02.770565  | 360              | 31.104.000   |
+| 50       | 200                 | 10000          | 0:00:23.811725  | 420              | 36.288.000   |
+| 100      | 100                 | 10000          | 0:00:22.055141  | 453              | 39.139.200   |
+| 200      | 50                  | 10000          | 0:00:22.355107  | 447              | 38.620.800   |
+| 1        | 10000               | 10000          | 0:00:51.448303  | 194              | 16.761.600   |
+| 10000    | 1                   | 10000          | 0:00:27.520348  | 363              | 31.363.200   |
+
+
+Columns:
+1. `Workers`: number of active workers making requests simultaneously.
+2. `Requests per Client`: number of requests each worker made.
+3. `Total Requests`: total number of requests processed.
+4. `Elapsed Time`: total elapsed time for the test.
+5. `Cap: Req/Seconds`: in the current workload, how many messages were processed each second.
+6. `Cap: Req/Day`: given this ratio of messages per client, how many messages could be processed each day.
+
+
+## Read test - Direct calls to gRPC server
+| Workers | Requests per Client | Limit Results to  | Total Fetched | Elapsed Time   | Rows fetched/sec | 
+|---------|---------------------|-------------------|---------------|----------------|------------------|
+| 1       | 10                  | 10000             | 100,000       | 0:00:11.031695 | 9090             |
+| 10      | 10                  | 10000             | 1,000,000     | 0:00:52.143278 | 19,230           |
+| 10      | 100                 | 10000             | 10,000,000    | 0:08:50.079260 | 18,867           |
+| 10      | 100                 | first             | 1,000         | 0:00:01.490819 | 1,000            |
+| 10      | 100                 | last              | 1,000         | 0:00:01.527391 | 1,000            |
+| 10      | 100                 | 100 newest        | 100,000       | 0:00:07.041533 | 14,285           |
+| 10      | 100                 | 100 oldest        | 1,000,000     | 0:00:07.155739 | 14,285           |
+| 100     | 100                 | 100 newest        | 1,000,000     | 0:01:05.692690 | 15,384           |
+| 100     | 100                 | 100 oldest        | 1,000,000     | 0:01:06.817975 | 15,151           |
+| 100     | 1000                | first             | 100,000       | 0:01:36.958435 | 1,041            |
+| 100     | 1000                | last              | 100,000       | 0:01:35.372245 | 1,052            |
+| 100     | 1000                | single row, by id | 100,000       | 0:01:38.419700 | 1,020            |
+| 1000    | 100                 | single row, by id | 100,000       | 0:01:46.748245 | 943              |
+| 10000   | 10                  | single row, by id | 100,000       | 0:01:46.222926 | 943              |
+
+
+Columns:
+1. `Workers`: number of active workers making requests simultaneously.
+2. `Requests per Client`: number of requests each worker made.
+3. `Limit Results to`: if any, which limiter was applied to the fetch request.
+4. `Total Fetched`: considering all workers and all requests, the amount of rows that were fetched.
+5. `Elapsed Time`: total elapsed time for the test.
+6. `Rows fetched/sec`: considering the total fetched and elapsed time values, how many rows were fetched each second.
+
+
+
+# Convenience scripts (or 'How to make it all work')
 You use the current scripts:
 1. `run_server.py`: starts the gRPC server. You should run this first.
 2. `run_api.py`: starts the flask API. You should run this after `run_server.py`, so it can connect to the server.
@@ -61,60 +128,8 @@ You use the current scripts:
 4. `run_send_api_request.py`: sends a post request to the API (good to make simple tests)
 5. `run_print_sensors_and_locations.py`: prints all sensors and locations available.
 6. `run_playground.py`: testing area. don't need to run it for anything.
+7. `run_client_benchmark.py`: runs a benchmark test. may need to configure the scenario.
 
-## Performance
-- *Update - Dec 12th, 2021*: I used the IDE (PyCharm) to run the gRPC server AND the API at the same time. To make the 
-requests I used another application I made using GoLang and the result was: 578 requests processed each second 
-(or 49.9 million requests/day). It's a good first start, but I believe I can do better.
-
-- *Update - Dec 21st, 2021*: After a bunch of refactoring in both this application and the one I use to test it, I've 
-got a better result: 1156 requests/second (or 99.8 million requests/day). I'm reasonably happy with the performance on 
-post (write) route, but performance on the get (read) route are way off of what I want it to be.
-
-### Test output for sending 5000 readings
-```text
-go-Request!::POST
-Your session id is: 051a2b75-6397-4e8e-b4da-2a87145e0ee2
-Making POST requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 1156 it/s)
-Done! Elapsed time: 514.3µs
-
-Process finished with the exit code 0
-```
-
-### Test output for sending 5000 request to get latest 1000 readings
-```text
-go-Request!::GET
-Your session id is: 95c7f4f2-b920-4717-9120-482ad24fdc49
-Making GET requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 176 it/s)
-Done! Elapsed time: 0s
-
-```
-
-### Test output for sending 5000 request to get latest 100 readings
-```text
-go-Request!::GET
-Your session id is: 27b122df-137e-4c15-86f9-04cef98eabe0
-Making GET requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 286 it/s)
-Done! Elapsed time: 0s
-
-Process finished with the exit code 0
-```
-
-### Test output for sending 5000 request to get the latest reading
-```text
-go-Request!::GET
-Your session id is: 5a8b4a86-6290-4594-8847-82479f01bf60
-Making GET requests 100% |████████████████████████████████████████████████████████████████████| (5000/5000, 128 it/s)
-Done! Elapsed time: 527.9µs
-
-
-Process finished with the exit code 0
-```
-
-# Big picture
-- Clients, services, private apis and other clients can access teh gRPC endpoints.
-- Meanwhile, a public API can be used (by a frontend or other third party applications), to make use of gRPC`s endpoint.  
-![Simplified big picture of this project](schema_envisdp_v1simple.png)
 
 
 # TODO
@@ -128,9 +143,7 @@ Process finished with the exit code 0
 7. Add stress tests
 
 
+
 # Next steps
 After finishing TODO items 1 and 2, I'll probably go look for a raspberry pi zero w and a couple of sensors, so I 
 can start "Audrey II" project.
-
-# Application used to test the API:
-go-Request: https://github.com/brenordv/go-request

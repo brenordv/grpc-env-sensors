@@ -4,12 +4,13 @@ import logging
 from datetime import datetime
 from concurrent import futures
 
+from raccoon_simple_stopwatch.stopwatch import StopWatch
+
 import server.pb.server_sensors_pb2 as pb2
 import server.pb.server_sensors_pb2_grpc as pb2_grpc
 from core.converters import KnownTypes
 from core import converters
 from core.services.storage_service import StorageService
-from core.utils import StopWatch
 
 
 class SensorServer(pb2_grpc.SensorService):

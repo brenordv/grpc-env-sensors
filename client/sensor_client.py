@@ -5,11 +5,12 @@ import grpc
 import logging
 from datetime import datetime
 
+from raccoon_simple_stopwatch.stopwatch import StopWatch
+
 import server.pb.server_sensors_pb2 as pb2
 import server.pb.server_sensors_pb2_grpc as pb2_grpc
 from core import converters
 from core.converters import KnownTypes
-from core.utils import StopWatch
 
 
 class SensorClient(object):

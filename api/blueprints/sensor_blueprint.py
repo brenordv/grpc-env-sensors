@@ -2,6 +2,7 @@
 import json
 
 from flask import Blueprint, jsonify, make_response, request
+from raccoon_simple_stopwatch.stopwatch import StopWatch
 
 from client.sensor_client import SensorClient
 from core import validators
@@ -10,7 +11,6 @@ from core.settings import POST_REQUEST_KEYS
 from core.utils import sanitize_post_save_reading
 
 sensors_controller = Blueprint("sensors", __name__, url_prefix="/sensors/v1")
-SENSOR_CLIENT = SensorClient()
 
 
 @sensors_controller.route("/", methods=["GET", ])
@@ -20,7 +20,7 @@ def get_sensor_readings():
         validators.is_number(limit, "limit result")
         limit = From(limit).to(KnownTypes.INT)
 
-    result = SENSOR_CLIENT.get_readings(limit=limit)
+    result = SensorClient().get_readings(limit=limit)
     return jsonify({
         **result,
         "payload": [p.__dict__ for p in result["payload"]]
@@ -32,6 +32,7 @@ def save_sensor_reading():
     if not request.json:
         return "Post has no body. What should I save?", 400
 
+    start = StopWatch(auto_start=True)
     body = request.json
     missing_keys = [k for k in POST_REQUEST_KEYS if k not in body]
     if len(missing_keys) > 0:
@@ -39,12 +40,16 @@ def save_sensor_reading():
 
     try:
         sanitized_body = sanitize_post_save_reading(body)
-        result = SENSOR_CLIENT.save_new_reading(**sanitized_body)
+        print(f"Body sanitization: {start.elapsed()}")
+        result = SensorClient().save_new_reading(**sanitized_body)
+        print(f"Response from server: {start.elapsed()}")
     except Exception as e:
         print(f"Error: {e} || {body}")
         raise
 
-    return make_response(json.dumps(result), 201)
+    response = make_response(json.dumps(result), 201)
+    print(f"Response ready to send: {start.end()}")
+    return response
 
 
 @sensors_controller.route("/<reading_id>", methods=["GET", ])
@@ -56,7 +61,7 @@ def get_sensor_reading(reading_id: str):
     except ValueError as ve:
         return str(ve), 400
 
-    result = SENSOR_CLIENT.get_reading(reading_id)
+    result = SensorClient().get_reading(reading_id)
 
     if not result["success"]:
         return result["error_message"], 400

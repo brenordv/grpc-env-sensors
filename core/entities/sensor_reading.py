@@ -2,12 +2,11 @@
 import uuid
 from datetime import datetime
 from typing import Union
-import persistent
 
 from core import validators
 
 
-class SensorReading(persistent.Persistent):
+class SensorReading(object):
     # Id
     _id: Union[str, None] = None
 
@@ -217,5 +216,18 @@ class SensorReading(persistent.Persistent):
         return self._updated_at
 
 
-if __name__ == '__main__':
-    a = SensorReading("s", "1", 4.20)
+def materialize(doc: dict) -> SensorReading:
+    return SensorReading(
+        reading_id=doc["_id"],
+        sensor_id=doc["_sensor_id"],
+        reading_location_id=doc["_reading_location_id"],
+        reading_value=doc["_reading_value"],
+        trusted_reading=doc["_is_trusted_reading"],
+        location_known=doc["_is_location_known"],
+        location_accurate=doc["_is_location_accurate"],
+        is_processed=doc["_is_processed"],
+        overall_integrity=doc["_overall_integrity"],
+        read_at=doc["_read_at"],
+        received_at=doc["_received_at"],
+        updated_at=doc["_updated_at"]
+    )

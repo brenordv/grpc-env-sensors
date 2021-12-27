@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from typing import Union
-import persistent
 
 from core import validators
 
 
-class Location(persistent.Persistent):
+class Location(object):
     _id: Union[str, None] = None
     _location_name: Union[str, None] = None
 
@@ -37,3 +36,10 @@ class Location(persistent.Persistent):
         validators.is_str_not_null_or_empty(value, "location name")
 
         self._location_name = value
+
+
+def materialize(doc: dict) -> Location:
+    return Location(
+        location_id=doc["_id"],
+        location_name=doc["_location_name"]
+    )
