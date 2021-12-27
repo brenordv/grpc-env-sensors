@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import Union, Generator
 import pymongo
+from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 
@@ -24,9 +25,9 @@ class StorageService(object):
     def __init__(self):
         # Just a reminder: Don't do this type of thing. Use a KeyVault of some sort...
         conn_string = SECRETS["connection_strings"]["mongodb_primary"]
-        client = pymongo.MongoClient(conn_string)
 
-        self._db: Database = client["envDatabase"]
+        self._client: MongoClient = pymongo.MongoClient(conn_string)
+        self._db: Database = self._client["envDatabase"]
         self._sensors: Collection = self._db["sensors"]
         self._locations: Collection = self._db["locations"]
         self._readings: Collection = self._db["readings"]
@@ -38,7 +39,7 @@ class StorageService(object):
         self.close()
 
     def close(self):
-        pass
+        self._client.close()
 
     @staticmethod
     def _get_one(col: Collection, find_op: dict):

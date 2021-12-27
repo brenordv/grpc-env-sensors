@@ -16,7 +16,7 @@ def _save_reading_worker_grpc(num_requests: int, wid: int):
     client = SensorClient()
     timer = StopWatch(auto_start=True)
 
-    for i in range(num_requests):
+    for _ in range(num_requests):
         client.save_new_reading(
             sensor_id="S1",
             reading_location_id="L1",
@@ -34,7 +34,7 @@ def _read_reading_worker_grpc(num_requests: int, wid: int, **kwargs):
     client = SensorClient()
     timer = StopWatch(auto_start=True)
 
-    for i in range(num_requests):
+    for _ in range(num_requests):
         client.get_readings(limit=kwargs["limit"])
     logger.info(f"## Worker: {wid} finished! Elapsed time: {timer.end()}")
 
@@ -47,7 +47,7 @@ def _read_reading_by_id_worker_grpc(num_requests: int, wid: int, **kwargs):
     client = SensorClient()
     timer = StopWatch(auto_start=True)
 
-    for i in range(num_requests):
+    for _ in range(num_requests):
         client.get_reading(reading_id=kwargs["reading_id"])
 
     logger.info(f"## Worker: {wid} finished! Elapsed time: {timer.end()}")
