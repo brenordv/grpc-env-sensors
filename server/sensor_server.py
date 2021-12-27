@@ -161,6 +161,13 @@ def serve(wait_for_termination: bool = True, max_workers: int = 10, secure_port:
             logging.info("[SERVER] Server is also standing by and waiting for termination...")
             server.wait_for_termination()
 
+    except KeyboardInterrupt:
+        logging.info("[SERVER] Shutting down per user request")
+
+    except Exception as e:
+        logging.error("[SERVER] Shutting down because of the following error:")
+        logging.exception(e)
+
     finally:
         sensor_server.shutdown()
 
