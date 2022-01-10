@@ -46,7 +46,7 @@ implement and scalable.
 
 
 # Big picture
-- Clients, services, private apis and other clients can access teh gRPC endpoints.
+- Clients, services, private apis and other clients can access the gRPC endpoints.
 - Meanwhile, a public API can be used (by a frontend or other third party applications), to make use of gRPC`s endpoint.  
 ![Simplified big picture of this project](schema_envisdp_v1simple.png)
 
